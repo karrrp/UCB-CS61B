@@ -106,38 +106,97 @@ public class Model extends Observable {
      *    value, then the leading two tiles in the direction of motion merge,
      *    and the trailing tile does not.
      * */
+
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
-
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-
+        for (int i = 0; i < board.size(); i++) {
+            if(move_one_col(i)){
+                changed = true;
+            }
+        }
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
     }
-
     /** Checks if the game is over and sets the gameOver variable
      *  appropriately.
      */
     private void checkGameOver() {
         gameOver = checkGameOver(board);
-    }
 
+    }
     /** Determine whether game is over. */
     private static boolean checkGameOver(Board b) {
         return maxTileExists(b) || !atLeastOneMoveExists(b);
     }
-
     /** Returns true if at least one space on the Board is empty.
      *  Empty spaces are stored as null.
      * */
+    public boolean move_one_col(int col){
+        int board_length = board.size();
+        boolean changed = false;
+        for (int i =board.size()- 2; i > -1 ; i--) {
+             if(board.tile(col,i)!=null ){
+                 if(if_move(board.tile(col,i))){
+                     changed = true;
+                 }
+                 if (move_one_Tile(board.tile(col,i),board_length)){
+                     board_length = board_length - 1;
+                 }
+
+             }
+        };
+        return changed;
+    }
+    public boolean move_one_Tile(Tile tile,int real_length){
+        int the_row = tile.row();
+        int the_col = tile.col();
+        int board_length = board.size();
+        for (int i = the_row + 1; i < real_length; i++) {
+            if (board.tile(the_col, i) != null) {
+                if (board.tile(the_col, i).value() == tile.value()) {
+                    score += tile.value() * 2;
+                    return board.move(the_col, i, tile);
+                } else if (i != the_row + 1) {
+                    return board.move(the_col, i - 1, tile);
+                }
+            } else if (i == real_length - 1) {
+                return board.move(the_col, real_length - 1, tile);
+
+            }
+        }
+            return false;
+        }
+    public boolean if_move(Tile tile){
+        int the_row = tile.row();
+        int the_col = tile.col();
+        int board_length = board.size();
+        for (int i = the_row + 1; i < board_length; i++) {
+            if (board.tile(the_col, i) != null && board.tile(the_col, i).value() != tile.value()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        int board_length = b.size();
+
+        for (int i = 0; i < board_length; i++) {
+            for (int j = 0; j < board_length; j++) {
+                if (b.tile(i,j) == null) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -148,8 +207,18 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
-        return false;
-    }
+        int board_length = b.size();
+        for (int i = 0; i < board_length; i++) {
+            for (int j = 0; j < board_length; j++) {
+                if (b.tile(i,j) != null && b.tile(i,j).value() == MAX_PIECE) {
+                    return true;
+                }
+
+            }
+
+        }
+            return false;}
+
 
     /**
      * Returns true if there are any valid moves on the board.
@@ -159,6 +228,41 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+       boolean hasEmptySpace = emptySpaceExists((b));
+       int board_length = b.size();
+
+        if (hasEmptySpace) {
+         return true;
+        } else{
+            for (int i = 0; i < board_length; i++) {
+                for (int j = 0; j < board_length; j++) {
+                    if (i-1 >= 0 ) {
+                        if(b.tile(i,j).value() == b.tile(i-1,j).value() ){
+                            return true;
+                            }
+                    }
+
+                    if (i+1 < board_length) {
+                        if( b.tile(i,j).value() == b.tile(i+1,j).value()){
+                            return true;
+                            }
+                    }
+                    if (j-1 >= 0 ) {
+                        if(b.tile(i,j).value() == b.tile(i,j-1).value()){
+                            return true;
+                        }
+                    }
+                    if (j+1 < board_length ) {
+                        if(b.tile(i,j).value() == b.tile(i,j+1).value()){
+                            return true;
+                        }
+                    }
+
+                }
+
+            }
+
+        }
         return false;
     }
 
