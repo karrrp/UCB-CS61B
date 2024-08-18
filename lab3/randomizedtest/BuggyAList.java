@@ -15,7 +15,7 @@ package randomizedtest;
 */
 
 public class BuggyAList<Item> {
-    private Item[] items;
+    public Item[] items;
     private int size;
 
     /** Creates an empty list. */
@@ -60,7 +60,8 @@ public class BuggyAList<Item> {
       * returns deleted item. */
     public Item removeLast() {
         if ((size < items.length / 4) && (size > 4)) {
-            resize(size / 4);
+            int new_size = (int) Math.round(items.length * 1.0 / 4);
+            resize(new_size);
         }
         Item x = getLast();
         items[size - 1] = null;

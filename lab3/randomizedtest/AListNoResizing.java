@@ -15,7 +15,7 @@ package randomizedtest;
 */
 
 public class AListNoResizing<Item> {
-    private Item[] items;
+    public Item[] items;
     private int size;
 
     /** Creates an empty list. */

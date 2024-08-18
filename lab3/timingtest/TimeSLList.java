@@ -21,8 +21,34 @@ public class TimeSLList {
         timeGetLast();
     }
 
+    public static double timesingleConstruction(int op_number,int numbers,SLList<Integer> time_test){
+        for (int i = 0; i < numbers; i++) {
+            time_test.addFirst(i);
+        }
+        Stopwatch sw = new Stopwatch();
+        for (int i = 0; i < op_number; i++) {
+            time_test.getLast();
+        }
+        double timeInSeconds = sw.elapsedTime();
+        return timeInSeconds;
+    }
+
     public static void timeGetLast() {
         // TODO: YOUR CODE HERE
+
+        AList<Integer> Numbers = new AList<>();
+        SLList<Integer> time_test = new SLList<>();
+        AList<Integer> ops = new AList<>();
+        AList<Double>  times = new AList<>();
+        for (int i = 1000; i < 130500; i = i * 2) {
+            Numbers.addLast(i);
+            ops.addLast(10000);
+        }
+        for (int i = 0; i < ops.size(); i++) {
+            double time = timesingleConstruction(ops.getLast(), Numbers.get(i),time_test );
+            times.addLast(time);
+        }
+        printTimingTable(Numbers,times,ops);
     }
 
 }
