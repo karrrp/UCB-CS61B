@@ -2,6 +2,9 @@ package gh2;
 
 /* Imports the required audio library from the
  * edu.princeton.cs.introcs package. */
+import deque.Deque;
+import deque.LinkedListDeque;
+import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.introcs.StdAudio;
 
 import org.junit.Test;
@@ -21,6 +24,23 @@ public class TestGuitarString  {
             aString.tic();
         }
     }
+    @Test
+    public void testQWED(){
+        String keyboard = "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
+        Deque<GuitarString> Note36 = new LinkedListDeque<>();
+        for (int i = 0; i < 36; i++) {
+            //440⋅2(i−24)/12
+            double CONCERT_I =440 * Math.pow(2, (i - 24) / 12.0);
+            GuitarString stringI = new GuitarString(CONCERT_I);
+            Note36.addLast(stringI);
+        }
+            GuitarString theone = Note36.get(30);
+            theone.pluck();
+            for (int i = 0; i < 50000; i += 1) {
+                double sample = theone.sample();
+                edu.princeton.cs.introcs.StdAudio.play(sample);
+                theone.tic();}
+}
 
     @Test
     public void testSample() {

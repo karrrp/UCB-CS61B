@@ -14,12 +14,10 @@ public class GuitarHeroLite {
 
     public static void main(String[] args) {
         /* create two guitar strings, for concert A and C */
-        GuitarString stringA = new GuitarString(CONCERT_A);
-        GuitarString stringC = new GuitarString(CONCERT_C);
         Deque<GuitarString> Note36 = new LinkedListDeque<>();
         for (int i = 0; i < 36; i++) {
             //440⋅2(i−24)/12
-            int CONCERT_I = 440 * 2 ^ ((i - 24)/12);
+            double CONCERT_I = 440 * Math.pow(2, (i - 24) / 12.0);;
             GuitarString stringI = new GuitarString(CONCERT_I);
 
             Note36.addLast(stringI);
@@ -35,15 +33,16 @@ public class GuitarHeroLite {
                 if (num > 0 && num < 36 ) {
                     GuitarString theone = Note36.get(num);
                     theone.pluck();
-                    double sample = theone.sample();
-
+                    for (int i = 0; i < 50000; i += 1) {
+                        double sample = theone.sample();
+                        edu.princeton.cs.introcs.StdAudio.play(sample);
+                        theone.tic();}
                     /* play the sample on standard audio */
-                    StdAudio.play(sample);
 
                     /* advance the simulation of each guitar string by one step */
-                    theone.tic();
 
-            }
+
+                }
 
             /* compute the superposition of samples */
 
