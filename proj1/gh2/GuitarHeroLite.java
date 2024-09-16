@@ -33,7 +33,7 @@ public class GuitarHeroLite {
                 if (num > 0 && num < 36 ) {
                     GuitarString theone = Note36.get(num);
                     theone.pluck();
-                    for (int i = 0; i < 50000; i += 1) {
+                    for (int i = 0; i < 20000; i += 1) {
                         double sample = theone.sample();
                         edu.princeton.cs.introcs.StdAudio.play(sample);
                         theone.tic();}

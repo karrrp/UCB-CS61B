@@ -229,5 +229,16 @@ public class LinkedListDequeTest {
         }
         lld1.printDeque();
     }
+    @Test
+    public void recursionGet_test(){
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
+        lld1.addLast(1);
+        lld1.addLast(2);
+        lld1.addLast(3);
+        lld1.addLast(325);
+        int actul = lld1.getRecursive(3);
+        assertEquals(325,actul);
+    }
+
 }
 

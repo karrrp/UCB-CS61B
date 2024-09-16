@@ -36,7 +36,7 @@ public class TestGuitarString  {
         }
             GuitarString theone = Note36.get(30);
             theone.pluck();
-            for (int i = 0; i < 50000; i += 1) {
+            for (int i = 0; i < 10000; i += 1) {
                 double sample = theone.sample();
                 edu.princeton.cs.introcs.StdAudio.play(sample);
                 theone.tic();}

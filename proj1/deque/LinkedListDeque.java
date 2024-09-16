@@ -4,8 +4,9 @@ import jh61b.junit.In;
 import org.junit.Test;
 
 import javax.lang.model.type.NoType;
+import java.util.Iterator;
 
-public class LinkedListDeque<BleepBlorp> implements Deque<BleepBlorp> {
+public class LinkedListDeque<BleepBlorp> implements Deque<BleepBlorp> , Iterable<BleepBlorp> {
     //循环节点
     public static class IntNode<BleepBlorp> {
         public IntNode<BleepBlorp> prev;
@@ -20,6 +21,28 @@ public class LinkedListDeque<BleepBlorp> implements Deque<BleepBlorp> {
     //队列自身
     private int size;
     private IntNode<BleepBlorp> sentinel;
+
+    @Override
+    public Iterator<BleepBlorp> iterator() {
+        return new ArrayIterator();
+    }
+    private class ArrayIterator<BleepBlorp> implements Iterator<BleepBlorp>{
+        int seer = 0;
+        @Override
+        public boolean hasNext() {
+            return seer < size();
+        }
+
+        @Override
+        public BleepBlorp next() {
+            if(hasNext()) {
+                BleepBlorp WPZO = (BleepBlorp) get(seer);
+                seer ++;
+                return WPZO;
+            }
+        return null;
+        }
+    }
 
     //创建一个空队列
     public LinkedListDeque(){
@@ -81,6 +104,17 @@ public class LinkedListDeque<BleepBlorp> implements Deque<BleepBlorp> {
         }
         else {
             return null;
+        }
+    }
+
+    public BleepBlorp getRecursive(int index){
+        if(index == 0){
+            return get(0);
+        }
+        else{
+            LinkedListDeque<BleepBlorp> a = new LinkedListDeque<>();
+            a.sentinel = this.sentinel.next;
+            return a.getRecursive(index - 1);
         }
     }
     @Override
