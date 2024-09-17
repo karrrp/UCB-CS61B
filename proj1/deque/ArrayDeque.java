@@ -1,7 +1,7 @@
 package deque;
-
-public class ArrayDeque<Gloup> implements Deque<Gloup> {
-    public Gloup[] items = (Gloup[]) new Object[8];
+import java.util.Iterator;
+public class ArrayDeque<T> implements Deque<T> ,Iterable<T> {
+    public T[] items = (T[]) new Object[8];
     int length = 8;
     private int size;
     int theFirst = 0;
@@ -16,7 +16,7 @@ public class ArrayDeque<Gloup> implements Deque<Gloup> {
         return size;
     }
     @Override
-    public Gloup get(int i){
+    public T get(int i){
         if(i > size()){
             return null;
         }
@@ -26,7 +26,7 @@ public class ArrayDeque<Gloup> implements Deque<Gloup> {
         return items[theFirst + i];
     }
     @Override
-    public void addFirst(Gloup i){
+    public void addFirst(T i){
         if(size == 0){
             theLast = 0;
             theFirst = 0;
@@ -35,7 +35,7 @@ public class ArrayDeque<Gloup> implements Deque<Gloup> {
             return;
         }
         if(size == length){
-            resize(this);
+            resize();
             addFirst(i);
             return;
         }
@@ -46,10 +46,10 @@ public class ArrayDeque<Gloup> implements Deque<Gloup> {
             theFirst = theFirst - 1;}
         items[theFirst] = i;
         size ++;
-        resize(this);
+        resize();
     }
     @Override
-    public void addLast(Gloup i){
+    public void addLast(T i){
         if(size == 0){
             theLast = 0;
             theFirst = 0;
@@ -58,7 +58,7 @@ public class ArrayDeque<Gloup> implements Deque<Gloup> {
             return;
         }
         else if(size == length){
-            resize(this);
+            resize();
             addLast(i);
             return;
         }
@@ -72,14 +72,14 @@ public class ArrayDeque<Gloup> implements Deque<Gloup> {
         size ++;
     }
 
-    private void resize(ArrayDeque<Gloup> p){
+    private void resize(){
         if(size == 0){
             return;
         }
         if ((size * 1.0 / length) < use_rate){
             //可优化的,魔数
             length = length / 4 + 1 ;
-            Gloup[] new_items = (Gloup[]) new Object[length];
+            T[] new_items = (T[]) new Object[length];
             for (int i = 0; i < size; i++) {
                 new_items[i] = get(i);
             }
@@ -87,7 +87,7 @@ public class ArrayDeque<Gloup> implements Deque<Gloup> {
         }
         else if(size == length) {
             length = 2 * length;
-            Gloup[] new_items = (Gloup[]) new Object[length];
+            T[] new_items = (T[]) new Object[length];
             for (int i = 0; i < size; i++) {
                 new_items[i] = get(i);
             }
@@ -104,7 +104,7 @@ public class ArrayDeque<Gloup> implements Deque<Gloup> {
     }
     @Override
     //特殊情况有点多
-    public Gloup removeLast(){
+    public T removeLast(){
         if(size==0){
             return null;
         }
@@ -113,13 +113,13 @@ public class ArrayDeque<Gloup> implements Deque<Gloup> {
             return items[theLast];
 
         }
-        Gloup item = items[theLast];
+        T item = items[theLast];
         theLast --;
         size --;
         return item;
     }
     @Override
-    public Gloup removeFirst(){
+    public T removeFirst(){
         if(size==0){
             return null;
         }
@@ -127,12 +127,32 @@ public class ArrayDeque<Gloup> implements Deque<Gloup> {
             size = 0;
             return items[theFirst];
         }
-        Gloup item = items[theFirst];
+        T item = items[theFirst];
         theFirst ++;
         size --;
         return item;
     }
 
+    private class LinklistIterator implements Iterator<T>{
 
+        private int seer = 0;
+        @Override
+        public boolean hasNext() {
+            return seer < size();
+        }
 
+        @Override
+        public T next() {
+            if(hasNext()) {
+                T WPZO = (T) get(seer);
+                seer ++;
+                return WPZO;
+            }
+            return null;
+        }
+    }
+    @Override
+    public Iterator<T> iterator() {
+        return new LinklistIterator();
+    }
 }
