@@ -75,6 +75,7 @@ public class LinkedListDequeTest {
         ll1.addLast(4);
         int expect_c =  ll1.removeFirst();
         assertEquals(expect_c,3);
+
     }
     @Test
     /** Adds an item, then removes an item, and ensures that dll is empty afterwards. */

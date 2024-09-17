@@ -8,7 +8,7 @@ import java.util.Comparator;
 import static org.junit.Assert.assertEquals;
 
 
-public class MaxTest<Hexu> {
+public class MaxTest<T> {
 /*    @Test
     public void SizeMaxtest(){
         MaxArrayDeque<Integer> sizeMax = new MaxArrayDeque<>();
@@ -19,7 +19,7 @@ public class MaxTest<Hexu> {
         assertEquals(3, max1);
     }*/
 
-    public static class Person implements Comparable<Person>{
+    public static class Person implements Comparable<Person> {
         public int age;
         public String id;
         public Person(int a, String c){
@@ -32,21 +32,21 @@ public class MaxTest<Hexu> {
             return this.age - o.age;
         }
     }
-    public class age_comparated implements Comparator<Person>{
+    public class age_comparated implements Comparator<Person> {
         @Override
         public int compare(Person o1, Person o2) {
             return o1.compareTo(o2);
         }
     }
 
-    public class ID_comparated implements Comparator<Person>{
+    public class ID_comparated implements Comparator<Person> {
         @Override
         public int compare(Person o1, Person o2) {
             return o1.id.compareTo(o2.id);
         }
     }
     @Test
-    public void string_test(){
+    public void string_test() {
         Person p1 =new Person(18,"A");
         Person p2 =new Person(28,"B");
         Person p3 =new Person(8,"C");
