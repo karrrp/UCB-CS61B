@@ -1,12 +1,12 @@
 package deque;
 import java.util.Iterator;
 public class ArrayDeque<T> implements Deque<T> ,Iterable<T> {
-    public T[] items = (T[]) new Object[8];
-    int length = 8;
+    private T[] items = (T[]) new Object[8];
+    private int length = 8;
     private int size;
-    int theFirst = 0;
-    int theLast = length - 1;
-    double use_rate = 0.25;
+    private int theFirst = 0;
+    private int theLast = length - 1;
+    private final double use_rate = 0.25;
 
     public ArrayDeque(){
         size = 0;
@@ -155,4 +155,21 @@ public class ArrayDeque<T> implements Deque<T> ,Iterable<T> {
     public Iterator<T> iterator() {
         return new LinklistIterator();
     }
+
+    public boolean equals(Object o){
+        if (o instanceof ArrayDeque<?>) {
+            ArrayDeque<T> o1 = (ArrayDeque<T>) o;
+            if (o1.size() == ((ArrayDeque<?>) o).size()) {
+                for (int i = 0; i < o1.size(); i++) {
+                    if (o1.get(i) != ((ArrayDeque<?>) o).get(i)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 }
+
+

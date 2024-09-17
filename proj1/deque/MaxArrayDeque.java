@@ -3,20 +3,17 @@ import jh61b.junit.In;
 
 import java.util.Comparator;
 
-public class MaxArrayDeque <Hexu> extends ArrayDeque<Hexu>  {
+public class MaxArrayDeque <T> extends ArrayDeque<T>  {
     private class size_Comparator implements Comparator<Integer> {
         public int compare(Integer o1, Integer o2){
             return o1 - o2;
         }
     }
-    public Comparator<Hexu> myComparator;
-    public MaxArrayDeque(){
-        myComparator = (Comparator<Hexu>) new size_Comparator();
-    }
-    public MaxArrayDeque(Comparator<Hexu> c){
+    private Comparator<T> myComparator;
+    public MaxArrayDeque(Comparator<T> c){
         myComparator = c;
     }
-    public Hexu max(){
+    public T max(){
         if(size() == 0){
             return null;
         }
@@ -28,7 +25,7 @@ public class MaxArrayDeque <Hexu> extends ArrayDeque<Hexu>  {
         }
         return get(max);
     }
-    public Hexu max(Comparator<Hexu> c){
+    public T max(Comparator<T> c){
         if(size() == 0){
             return null;
         }

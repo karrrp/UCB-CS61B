@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 public class LinkedListDeque<T> implements Deque<T> , Iterable<T> {
     //循环节点
-    public static class IntNode<T> {
+    private static class IntNode<T> {
         public IntNode<T> prev;
         public T item;
         public IntNode<T> next;
@@ -24,7 +24,7 @@ public class LinkedListDeque<T> implements Deque<T> , Iterable<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return new ArrayIterator<T>();
+        return new ArrayIterator<>();
     }
     private class ArrayIterator<T> implements Iterator<T>{
         int seer = 0;
@@ -54,7 +54,7 @@ public class LinkedListDeque<T> implements Deque<T> , Iterable<T> {
     @Override
     // add
     public void addFirst(T x){
-        IntNode<T> NewNode = new IntNode<T>(x,sentinel,sentinel.next);
+        IntNode<T> NewNode = new IntNode<>(x,sentinel,sentinel.next);
         sentinel.next.prev = NewNode;
         sentinel.next =NewNode;
         size ++;
@@ -85,8 +85,8 @@ public class LinkedListDeque<T> implements Deque<T> , Iterable<T> {
         if(sentinel.next != sentinel) {
             size -= 1;
             IntNode<T> theNote = sentinel.next;
-            sentinel.next = sentinel.next.next;
             sentinel.next.next.prev = sentinel;
+            sentinel.next = sentinel.next.next;
             return theNote.item;
         }
         else {
@@ -134,11 +134,18 @@ public class LinkedListDeque<T> implements Deque<T> , Iterable<T> {
     //TO BE FINISHED
     // public Iterator<T> iterator()
     public boolean equals(Object o){
-        if (!(o instanceof LinkedListDeque<?>)){
-            return false;
+        if (o instanceof LinkedListDeque<?>) {
+            LinkedListDeque<T> o1 = (LinkedListDeque<T>) o;
+            if (o1.size() == ((LinkedListDeque<?>) o).size()) {
+                for (int i = 0; i < o1.size(); i++) {
+                    if (o1.get(i) != ((LinkedListDeque<?>) o).get(i)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
-        else{
-             return true;
-        }
+        return false;
     }
-}
+    }
+

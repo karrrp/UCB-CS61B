@@ -64,13 +64,17 @@ public class LinkedListDequeTest {
     @Test
     public void removeMuch(){
         LinkedListDeque<Integer> ll1 = new LinkedListDeque<>();
-        for (int i = 0; i < 8; i++) {
-            ll1.addFirst(i);
+        for (int i = 0; i < 2; i++) {
+            ll1.addLast(i);
         }
-        ll1.removeLast();
-        ll1.removeLast();
-        ll1.removeLast();
-
+        int expect_a =  ll1.removeLast();
+        assertEquals(expect_a,1);
+        ll1.addFirst(3);
+        int expect_b =  ll1.removeLast();
+        assertEquals(expect_b,0);
+        ll1.addLast(4);
+        int expect_c =  ll1.removeFirst();
+        assertEquals(expect_c,3);
     }
     @Test
     /** Adds an item, then removes an item, and ensures that dll is empty afterwards. */
