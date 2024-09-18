@@ -16,7 +16,10 @@ public class GuitarString {
     /* Buffer for storing sound data. */
         private Deque<Double> buffer;
 
-    /* Create a guitar string of the given frequency.  */
+    /**
+     * Creates a guitar string of the given frequency.
+     * @param frequency the frequency of the tune
+     */
     public GuitarString(double frequency) {
         int capacity =(int) Math.round(SR / frequency);
         buffer = new LinkedListDeque<>();

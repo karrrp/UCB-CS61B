@@ -35,16 +35,13 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             items[theFirst] = i;
             size++;
             return;
-        }
-        if(size == length) {
+        } else if(size == length) {
             resize();
             addFirst(i);
             return;
-        }
-        else if (theFirst == 0) {
+        } else if (theFirst == 0) {
             theFirst = length - 1;
-        }
-        else {
+        } else {
             theFirst = theFirst - 1;}
         items[theFirst] = i;
         size++;
@@ -57,16 +54,13 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             items[theLast] = i;
             size++;
             return;
-        }
-        else if (size == length) {
+        } else if (size == length) {
             resize();
             addLast(i);
             return;
-        }
-        else if (theLast == length - 1) {
+        } else if (theLast == length - 1) {
             theLast = 0;
-        }
-        else {
+        } else {
             theLast = theLast + 1;
         }
         items[theLast] = i;
@@ -85,8 +79,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
                 new_items[i] = get(i);
             }
             items = new_items;
-        }
-        else if(size == length) {
+        } else if(size == length) {
             int new_length = 2 * length;
             T[] new_items = (T[]) new Object[new_length];
             for (int i = 0; i < size; i++) {
@@ -111,8 +104,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     public T removeLast() {
         if (size==0) {
             return null;
-        }
-        else if (size == 1) {
+        } else if (size == 1) {
             size = 0;
             return items[theLast];
 
@@ -126,8 +118,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     public T removeFirst() {
         if (size==0) {
             return null;
-        }
-        else if (size == 1) {
+        } else if (size == 1) {
             size = 0;
             return items[theFirst];
         }
