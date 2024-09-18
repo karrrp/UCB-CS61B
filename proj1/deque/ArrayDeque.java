@@ -2,7 +2,7 @@ package deque;
 import java.util.Iterator;
 public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private T[] items = (T[]) new Object[8];
-    private int length = 8;
+    private int length ;
     private int size;
     private int theFirst = 0;
     private int theLast = length - 1;
@@ -10,10 +10,12 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
     public ArrayDeque() {
         size = 0;
+        length = items.length;
     }
     @Override
     public int size() {
         return size;
+
     }
     @Override
     public T get(int i) {
@@ -85,12 +87,15 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             items = new_items;
         }
         else if(size == length) {
-            length = 2 * length;
-            T[] new_items = (T[]) new Object[length];
+            int new_length = 2 * length;
+            T[] new_items = (T[]) new Object[new_length];
             for (int i = 0; i < size; i++) {
                 new_items[i] = get(i);
             }
             items = new_items;
+            length = new_length;
+            theFirst = 0;
+            theLast = size() - 1;
         }
 
     }
