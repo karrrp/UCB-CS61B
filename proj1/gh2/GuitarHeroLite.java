@@ -13,13 +13,12 @@ public class GuitarHeroLite {
 
     public static void main(String[] args) {
         /* create two guitar strings, for concert A and C */
-        Deque<GuitarString> Note36 = new LinkedListDeque<>();
+        Deque<GuitarString> nodeA36 = new LinkedListDeque<>();
         for (int i = 0; i < 36; i++) {
             //440⋅2(i−24)/12
             double CONCERT_I = 440 * Math.pow(2, (i - 24) / 12.0);;
             GuitarString stringI = new GuitarString(CONCERT_I);
-
-            Note36.addLast(stringI);
+            nodeA36.addLast(stringI);
         }
         String keyboard = "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
         while (true) {
@@ -29,14 +28,14 @@ public class GuitarHeroLite {
 
                 char key = StdDraw.nextKeyTyped();
                 int num = keyboard.indexOf(key);
-                if (num > 0 && num < 36 ) {
-                    GuitarString theone = Note36.get(num);
-                    theone.pluck();
+                if (num > 0 && num < 36) {
+                    GuitarString theOne = nodeA36.get(num);
+                    theOne.pluck();
                     for (int i = 0; i < 20000; i += 1) {
-                        double sample = theone.sample();
+                        double sample = theOne.sample();
                         edu.princeton.cs.introcs.StdAudio.play(sample);
-                        theone.tic();}
-                    theone.pluck();
+                        theOne.tic(); }
+                    theOne.pluck();
                     /* play the sample on standard audio */
 
                     /* advance the simulation of each guitar string by one step */
@@ -46,8 +45,8 @@ public class GuitarHeroLite {
 
             /* compute the superposition of samples */
 
+            }
         }
     }
-}
 }
 

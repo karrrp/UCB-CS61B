@@ -11,14 +11,14 @@ public class GuitarString {
     private static final double DECAY = .996; // energy decay factor
 
     /* Buffer for storing sound data. */
-        private Deque<Double> buffer;
+    private Deque<Double> buffer;
 
     /**
      * Creates a guitar string of the given frequency.
      * @param frequency the frequency of the tune
      */
     public GuitarString(double frequency) {
-        int capacity =(int) Math.round(SR / frequency);
+        int capacity = (int) Math.round(SR / frequency);
         buffer = new LinkedListDeque<>();
         for (int i = 0; i < capacity; i++) {
             buffer.addFirst(.0);

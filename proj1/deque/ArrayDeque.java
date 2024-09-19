@@ -36,7 +36,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             items[theFirst] = i;
             size++;
             return;
-        } else if(size == length) {
+        } else if (size == length) {
             resize();
             addFirst(i);
             return;
@@ -73,23 +73,23 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (size == 0) {
             return;
         }
-        double use_rate = 0.25;
-        if ((size * 1.0 / length) < use_rate) {
+        double useRate = 0.25;
+        if (length > 8 && (size * 1.0 / length) < useRate) {
             //可优化的,魔数
             length = length / 4 + 1;
-            T[] new_items = (T[]) new Object[length];
+            T[] newItems = (T[]) new Object[length];
             for (int i = 0; i < size; i++) {
-                new_items[i] = get(i);
+                newItems[i] = get(i);
             }
-            items = new_items;
+            items = newItems;
         } else if (size == length) {
-            int new_length = 2 * length;
-            T[] new_items = (T[]) new Object[new_length];
+            int newLength = 2 * length;
+            T[] newItems = (T[]) new Object[newLength];
             for (int i = 0; i < size; i++) {
-                new_items[i] = get(i);
+                newItems[i] = get(i);
             }
-            items = new_items;
-            length = new_length;
+            items = newItems;
+            length = newLength;
             theFirst = 0;
             theLast = size() - 1;
         }
@@ -106,7 +106,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     //特殊情况有点多
     public T removeLast() {
         if (size == 0) {
-            throw new NullPointerException("There are nothing to remove!");
+            return null;
         } else if (size == 1) {
             size = 0;
             return items[theLast];
@@ -119,12 +119,13 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             theLast--;
         }
         size--;
+        resize();
         return item;
     }
     @Override
     public T removeFirst() {
         if (size == 0) {
-            throw new NullPointerException("There are nothing to remove!");
+            return null;
         } else if (size == 1) {
             size = 0;
             return items[theFirst];
@@ -136,6 +137,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             theFirst++;
         }
         size--;
+        resize();
         return item;
     }
 
@@ -172,9 +174,12 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
                     }
                 }
                 return true;
+            } else {
+                return false;
             }
+        } else {
+            return false;
         }
-        return false;
     }
 }
 
