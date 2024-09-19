@@ -74,14 +74,17 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             return;
         }
         double useRate = 0.25;
-        if (length > 8 && (size * 1.0 / length) < useRate) {
+        if (length > 32 && (size * 1.0 / length) < useRate) {
             //可优化的,魔数
-            length = length / 4 + 1;
-            T[] newItems = (T[]) new Object[length];
+            int newLength = length / 4 + 1;
+            T[] newItems = (T[]) new Object[newLength];
             for (int i = 0; i < size; i++) {
                 newItems[i] = get(i);
             }
             items = newItems;
+            length = newLength;
+            theFirst = 0;
+            theLast = size() - 1;
         } else if (size == length) {
             int newLength = 2 * length;
             T[] newItems = (T[]) new Object[newLength];

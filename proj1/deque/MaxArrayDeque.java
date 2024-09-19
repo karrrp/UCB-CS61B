@@ -2,7 +2,7 @@ package deque;
 import java.util.Comparator;
 
 public class MaxArrayDeque<T> extends ArrayDeque<T> {
-    private class Size_Comparator implements Comparator<Integer> {
+    private class Sizecomparator implements Comparator<Integer> {
         public int compare(Integer o1, Integer o2) {
             return o1 - o2;
         }
