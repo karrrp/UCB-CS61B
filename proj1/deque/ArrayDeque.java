@@ -2,15 +2,16 @@ package deque;
 import java.util.Iterator;
 public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private T[] items = (T[]) new Object[8];
-    private int length ;
+    private int length;
     private int size;
-    private int theFirst = 0;
-    private int theLast = length - 1;
-    private final double use_rate = 0.25;
+    private int theFirst;
+    private int theLast;
 
     public ArrayDeque() {
         size = 0;
         length = items.length;
+        theFirst = 0;
+        theLast = 0;
     }
     @Override
     public int size() {
@@ -19,7 +20,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
     @Override
     public T get(int i) {
-        if (i > size()){
+        if (i > size()) {
             return null;
         }
         if (theFirst + i > length - 1) {
@@ -42,13 +43,14 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         } else if (theFirst == 0) {
             theFirst = length - 1;
         } else {
-            theFirst = theFirst - 1;}
+            theFirst = theFirst - 1;
+        }
         items[theFirst] = i;
         size++;
     }
     @Override
     public void addLast(T i) {
-        if(size == 0){
+        if (size == 0) {
             theLast = 0;
             theFirst = 0;
             items[theLast] = i;
@@ -68,18 +70,19 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     private void resize() {
-        if(size == 0){
+        if (size == 0) {
             return;
         }
+        double use_rate = 0.25;
         if ((size * 1.0 / length) < use_rate) {
             //可优化的,魔数
-            length = length / 4 + 1 ;
+            length = length / 4 + 1;
             T[] new_items = (T[]) new Object[length];
             for (int i = 0; i < size; i++) {
                 new_items[i] = get(i);
             }
             items = new_items;
-        } else if(size == length) {
+        } else if (size == length) {
             int new_length = 2 * length;
             T[] new_items = (T[]) new Object[new_length];
             for (int i = 0; i < size; i++) {
@@ -102,28 +105,36 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     @Override
     //特殊情况有点多
     public T removeLast() {
-        if (size==0) {
-            return null;
+        if (size == 0) {
+            throw new NullPointerException("There are nothing to remove!");
         } else if (size == 1) {
             size = 0;
             return items[theLast];
 
         }
         T item = items[theLast];
-        theLast--;
+        if (theLast == 0) {
+            theLast = length - 1;
+        } else {
+            theLast--;
+        }
         size--;
         return item;
     }
     @Override
     public T removeFirst() {
-        if (size==0) {
-            return null;
+        if (size == 0) {
+            throw new NullPointerException("There are nothing to remove!");
         } else if (size == 1) {
             size = 0;
             return items[theFirst];
         }
         T item = items[theFirst];
-        theFirst++;
+        if (theFirst == length - 1) {
+            theFirst = 0;
+        } else {
+            theFirst++;
+        }
         size--;
         return item;
     }

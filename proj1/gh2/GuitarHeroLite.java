@@ -1,7 +1,6 @@
 package gh2;
 import deque.Deque;
 import deque.LinkedListDeque;
-import edu.princeton.cs.algs4.StdAudio;
 import edu.princeton.cs.algs4.StdDraw;
 
 /**
@@ -37,6 +36,7 @@ public class GuitarHeroLite {
                         double sample = theone.sample();
                         edu.princeton.cs.introcs.StdAudio.play(sample);
                         theone.tic();}
+                    theone.pluck();
                     /* play the sample on standard audio */
 
                     /* advance the simulation of each guitar string by one step */

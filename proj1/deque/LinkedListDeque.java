@@ -1,9 +1,4 @@
 package deque;
-
-import jh61b.junit.In;
-import org.junit.Test;
-
-import javax.lang.model.type.NoType;
 import java.util.Iterator;
 
 public class LinkedListDeque<T> implements Deque<T> , Iterable<T> {
@@ -104,7 +99,7 @@ public class LinkedListDeque<T> implements Deque<T> , Iterable<T> {
             sentinel.next = sentinel.next.next;
             return theNote.item;
         } else {
-            return null;
+            throw new NullPointerException("There are nothing to remove!");
         }
     }
     /**
@@ -119,7 +114,7 @@ public class LinkedListDeque<T> implements Deque<T> , Iterable<T> {
             sentinel.prev = sentinel.prev.prev;
             return theNote.item;
         } else {
-            return null;
+            throw new NullPointerException("There are nothing to remove!");
         }
     }
 

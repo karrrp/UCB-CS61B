@@ -9,7 +9,7 @@ import java.io.InputStream;
 /**
  * Plays guitar from MIDI files.
  *
- * @author Eli Lipsitz
+ * @author Ya Jun
  */
 public class GuitarPlayer {
     private Sequence sequence = null;
