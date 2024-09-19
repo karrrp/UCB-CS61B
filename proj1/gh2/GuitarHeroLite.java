@@ -15,8 +15,8 @@ public class GuitarHeroLite {
         /* create two guitar strings, for concert A and C */
         Deque<GuitarString> nodeA36 = new LinkedListDeque<>();
         for (int i = 0; i < 36; i++) {
-            double CONCERT_I = 440 * Math.pow(2, (i - 24) / 12.0);;
-            GuitarString stringI = new GuitarString(CONCERT_I);
+            double toneFez = 440 * Math.pow(2, (i - 24) / 12.0);
+            GuitarString stringI = new GuitarString(toneFez);
             nodeA36.addLast(stringI);
         }
         String keyboard = "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
