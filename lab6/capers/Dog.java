@@ -1,17 +1,19 @@
 package capers;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashSet;
+
 import static capers.Utils.*;
 
 /** Represents a dog that can be serialized.
  * @author TODO
 */
-public class Dog { // TODO
+public class Dog implements Serializable { // TODO
 
     /** Folder that dogs live in. */
-    static final File DOG_FOLDER = null; // TODO (hint: look at the `join`
-                                         //      function in Utils)
+    static final File DOG_FOLDER = new File(".capers\\dogs");
 
     /** Age of dog. */
     private int age;
@@ -19,6 +21,7 @@ public class Dog { // TODO
     private String breed;
     /** Name of dog. */
     private String name;
+    private static HashSet<String> nameSet = new HashSet<>();
 
     /**
      * Creates a dog object with the specified parameters.
@@ -27,9 +30,17 @@ public class Dog { // TODO
      * @param age Age of dog
      */
     public Dog(String name, String breed, int age) {
+        if (!nameSet.contains(name)) {
+            nameSet.add(name);
+        } else{
+            throw new RuntimeException("the name must be UNIQUE");
+        }
         this.age = age;
         this.breed = breed;
         this.name = name;
+    }
+    public static Boolean hasName(String name) {
+        return nameSet.contains(name);
     }
 
     /**
@@ -39,17 +50,19 @@ public class Dog { // TODO
      * @return Dog read from file
      */
     public static Dog fromFile(String name) {
-        // TODO (hint: look at the Utils file)
-        return null;
+        File tarDog = Utils.join(".capers","dogs",name);
+        Dog serializableDog = readObject(tarDog, Dog.class);
+        return serializableDog;
     }
-
     /**
      * Increases a dog's age and celebrates!
      */
+
     public void haveBirthday() {
         age += 1;
-        System.out.println(toString());
-        System.out.println("Happy birthday! Woof! Woof!");
+        this.saveDog();
+        System.out.println(this);
+        System.out.print("Happy birthday! Woof! Woof!");
     }
 
     /**
@@ -57,6 +70,13 @@ public class Dog { // TODO
      */
     public void saveDog() {
         // TODO (hint: don't forget dog names are unique)
+        File newDog = new File(DOG_FOLDER, name);
+        try {
+            newDog.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        writeObject(newDog, this);
     }
 
     @Override
