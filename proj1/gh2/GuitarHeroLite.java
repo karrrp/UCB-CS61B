@@ -67,7 +67,7 @@ public class GuitarHeroLite {
 
             // 绘制键位标签
             StdDraw.setPenColor(StdDraw.BLACK);
-            StdDraw.text(i * keyWidth + keyWidth / 2, 80, String.valueOf(keyboard.charAt(i))); // 字体位置稍微下移
+            StdDraw.text(i * keyWidth + keyWidth / 2, 80, String.valueOf(keyboard.charAt(i))); //
         }
 
         // 绘制黑键
@@ -78,15 +78,15 @@ public class GuitarHeroLite {
                 int position = blackKeyPositions[i] + j * 12;
                 if (position < 36) {
                     StdDraw.setPenColor(StdDraw.BLACK);
-                    StdDraw.filledRectangle(position * keyWidth + blackKeyOffset, 120, keyWidth / 4, 40); // 高度调整
+                    StdDraw.filledRectangle(position * keyWidth + blackKeyOffset, 150, keyWidth / 4, 40); // 高度调整
                 }
             }
         }
-
-        // 绘制说明文本
+        /*
+        
         StdDraw.setPenColor(StdDraw.BLUE);
         StdDraw.text(400, 180, "Press the keys to play the guitar strings");
-    }
+    */}
 
     // 高亮当前按下的键
     private static void highlightKey(int keyIndex, int totalKeys) {

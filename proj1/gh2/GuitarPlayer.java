@@ -39,6 +39,8 @@ public class GuitarPlayer {
             strings[i] = new GuitarString(440.0 * Math.pow(2.0, (i - 69.0) / 12.0));
             vol[i] = 0.0;
         }
+
+
     }
 
     private void tic() {
