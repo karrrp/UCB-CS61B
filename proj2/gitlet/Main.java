@@ -57,6 +57,7 @@ public class Main {
                 break;
             case "status":
                 validateNumArgs("status", args, 1);
+                gitlet.status();
                 break;
             case "checkout":
                 if (args.length == 3 && args[1].equals("--")) {
@@ -66,6 +67,10 @@ public class Main {
                 } else if (args.length == 2) {
                     gitlet.checkoutBranch(args[1]);
                 }
+                break;
+            case "branch":
+                validateNumArgs("branch", args,2);
+                gitlet.branch(args[2]);
                 break;
             case "rm-branch":
                 validateNumArgs("rm-branch", args, 2);

@@ -1,11 +1,7 @@
 package gitlet;
-import javax.management.loading.ClassLoaderRepository;
 import java.io.*;
 import java.util.*;
 import static gitlet.Utils.*;
-
-// TODO: any imports you need here
-
 /** Represents a gitlet repository.
  *  设立持久性，建立.git文件夹以及blobs和stage文件夹。
  *  将不同命令的逻辑推给不同的类，
@@ -62,7 +58,7 @@ public class Repository {
             /*提交初始commit*/
             Stage curStaged = readObject(staged, Stage.class);
             Commit initial_commit = new Commit("initial commit", null, curStaged);
-            /* hand the commit bolbs*/
+            /* hand the commit BolS*/
             try {
                 write_commit(initial_commit);
             } catch (IOException e) {
@@ -209,6 +205,7 @@ public class Repository {
         if(plainFilenamesIn(GITLET_DIR) != null) {
             for (String i : plainFilenamesIn(GITLET_DIR)) {
                 if (i.equals(branchName)) {
+                    System.out.println("A branch with that name already exists.");
                     return;
                 }
             }
