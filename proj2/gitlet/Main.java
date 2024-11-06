@@ -1,13 +1,8 @@
 package gitlet;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
 import static gitlet.Repository.GITLET_DIR;
-import static gitlet.Repository.head;
 import static gitlet.Utils.join;
-import static gitlet.Utils.plainFilenamesIn;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author TODO
@@ -96,8 +91,7 @@ public class Main {
     public static void validateNumArgs(String cmd, String[] args, int n) {
         if (GITLET_DIR.exists()) {
             if (args.length != n) {
-                throw new RuntimeException(
-                        String.format("Incorrect operands."));
+                throw new RuntimeException("Incorrect operands.");
             }
         }
     }
