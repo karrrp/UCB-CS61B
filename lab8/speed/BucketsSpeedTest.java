@@ -3,14 +3,11 @@ package speed;
 import edu.princeton.cs.algs4.Stopwatch;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Scanner;
 
-import hashmap.Map61B;
-import hashmap.MyHashMapALBuckets;
-import hashmap.MyHashMapLLBuckets;
-import hashmap.MyHashMapTSBuckets;
-import hashmap.MyHashMapHSBuckets;
-import hashmap.MyHashMapPQBuckets;
+import hashmap.*;
+import org.junit.Test;
 
 /** Performs a timing test on three different set implementations.
  *  @author Neil Kulkarni adapted from Josh Hug, Brendan Hu
@@ -48,7 +45,6 @@ public class BucketsSpeedTest {
         } while (!repeat.equalsIgnoreCase("n") && !repeat.equalsIgnoreCase("no"));
         input.close();
     }
-
     /**
      * Returns time needed to put N random strings of length L into the
      * hashmap.Map61B 61bMap.

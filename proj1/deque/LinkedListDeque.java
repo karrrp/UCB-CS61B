@@ -16,7 +16,6 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     //队列自身
     private int size;
     private IntNode<T> sentinel;
-
     @Override
     public Iterator<T> iterator() {
         return new ArrayIterator();

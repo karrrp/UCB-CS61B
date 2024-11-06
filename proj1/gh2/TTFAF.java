@@ -7,10 +7,8 @@ import java.util.Base64;
 import java.util.zip.GZIPInputStream;
 
 /**
- * This code does some stuff. Run it (with sound on!) to find out what stuff it does!
- * Requires completion of CS 61B Homework 1.
- *
- * @author Eli Lipsitz
+ * 曲子演示
+ * @author chen
  */
 public class TTFAF {
     public static void main(String[] args) {

@@ -13,7 +13,7 @@ import static capers.Utils.*;
 public class Dog implements Serializable { // TODO
 
     /** Folder that dogs live in. */
-    static final File DOG_FOLDER = new File(".capers\\dogs");
+    static final File DOG_FOLDER = Utils.join(".capers\\dogs");
 
     /** Age of dog. */
     private int age;
@@ -69,7 +69,6 @@ public class Dog implements Serializable { // TODO
      * Saves a dog to a file for future use.
      */
     public void saveDog() {
-        // TODO (hint: don't forget dog names are unique)
         File newDog = new File(DOG_FOLDER, name);
         try {
             newDog.createNewFile();

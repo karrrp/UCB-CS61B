@@ -20,7 +20,7 @@ public class CapersRepository {
     /** Main metadata folder. */
 
     
-    static final File CAPERS_FOLDER = new File(".capers"); // TODO Hint: look at the `join`
+    static final File CAPERS_FOLDER = new File(".capers");
     static final File STORES_FOLDER = new File(".capers\\story");
     static final File DOGS_FOLDER = new File(".capers\\dogs");
     /**

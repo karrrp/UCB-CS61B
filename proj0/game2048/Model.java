@@ -1,11 +1,10 @@
 package game2048;
 
-import java.util.Formatter;
-import java.util.Observable;
-
+import java.util.*;
+import java.util.function.Predicate;
 
 /** The state of a game of 2048.
- *  @author TODO: YOUR NAME HERE
+ *  @author Exuanbo
  */
 public class Model extends Observable {
     /** Current contents of the board. */
@@ -106,98 +105,95 @@ public class Model extends Observable {
      *    value, then the leading two tiles in the direction of motion merge,
      *    and the trailing tile does not.
      * */
-
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
-        // TODO: Modify this.board (and perhaps this.score) to account
-        // for the tilt to the Side SIDE. If the board changed, set the
-        // changed local variable to true.
-        for (int i = 0; i < board.size(); i++) {
-            if(move_one_col(i)){
-                changed = true;
+
+        Set<Tile> changedTiles = new HashSet<>();
+        board.setViewingPerspective(side);
+        for (int row = board.size() - 2; row >= 0; row--) {
+            for (int col = 0; col < board.size(); col++) {
+                Tile tile = board.tile(col, row);
+                if (tile == null) {
+                    continue;
+                }
+                VTile vTile = new VTile(new Coordinate(col, row), tile);
+                boolean isChangedAfterMove = moveTileUp(vTile, changedTiles);
+                if (isChangedAfterMove) {
+                    changed = true;
+                }
             }
         }
+        board.setViewingPerspective(Side.NORTH);
+
+        // for the tilt to the Side SIDE. If the board changed, set the
+        // changed local variable to true.
+
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
     }
+
+    private boolean moveTileUp(VTile vTile, Set<Tile> changedTiles) {
+        int targetRow;
+        VTile nearest = findNearestTileAbove(vTile);
+        if (nearest == null) {
+            targetRow = board.size() - 1;
+        } else if (vTile.actualTile.value() == nearest.actualTile.value() && !changedTiles.contains(nearest.actualTile)) {
+            targetRow = nearest.row;
+        } else if (nearest.row == vTile.row + 1) {
+            return false;
+        } else {
+            targetRow = nearest.row - 1;
+        }
+        boolean isMerged = board.move(vTile.col, targetRow, vTile.actualTile);
+        if (isMerged) {
+            score += vTile.actualTile.next().value();
+            changedTiles.add(board.tile(vTile.col, targetRow));
+        }
+        return true;
+    }
+
+    private VTile findNearestTileAbove(VTile vTile) {
+        for (int row = vTile.row + 1; row < board.size(); row++) {
+            Tile actualTile = board.tile(vTile.col, row);
+            if (actualTile != null) {
+                return new VTile(new Coordinate(vTile.col, row), actualTile);
+            }
+        }
+        return null;
+    }
+
+    private static class VTile {
+        int col;
+        int row;
+        Tile actualTile;
+        public VTile(Coordinate c, Tile t) {
+            col = c.col;
+            row = c.row;
+            actualTile = t;
+        }
+    }
+
     /** Checks if the game is over and sets the gameOver variable
      *  appropriately.
      */
     private void checkGameOver() {
         gameOver = checkGameOver(board);
-
     }
+
     /** Determine whether game is over. */
     private static boolean checkGameOver(Board b) {
         return maxTileExists(b) || !atLeastOneMoveExists(b);
     }
+
     /** Returns true if at least one space on the Board is empty.
      *  Empty spaces are stored as null.
      * */
-    public boolean move_one_col(int col){
-        int board_length = board.size();
-        boolean changed = false;
-        for (int i =board.size()- 2; i > -1 ; i--) {
-             if(board.tile(col,i)!=null ){
-                 if(if_move(board.tile(col,i))){
-                     changed = true;
-                 }
-                 if (move_one_Tile(board.tile(col,i),board_length)){
-                     board_length = board_length - 1;
-                 }
-
-             }
-        };
-        return changed;
-    }
-    public boolean move_one_Tile(Tile tile,int real_length){
-        int the_row = tile.row();
-        int the_col = tile.col();
-        int board_length = board.size();
-        for (int i = the_row + 1; i < real_length; i++) {
-            if (board.tile(the_col, i) != null) {
-                if (board.tile(the_col, i).value() == tile.value()) {
-                    score += tile.value() * 2;
-                    return board.move(the_col, i, tile);
-                } else if (i != the_row + 1) {
-                    return board.move(the_col, i - 1, tile);
-                }
-            } else if (i == real_length - 1) {
-                return board.move(the_col, real_length - 1, tile);
-
-            }
-        }
-            return false;
-        }
-    public boolean if_move(Tile tile){
-        int the_row = tile.row();
-        int the_col = tile.col();
-        int board_length = board.size();
-        for (int i = the_row + 1; i < board_length; i++) {
-            if (board.tile(the_col, i) != null && board.tile(the_col, i).value() != tile.value()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
-        int board_length = b.size();
-
-        for (int i = 0; i < board_length; i++) {
-            for (int j = 0; j < board_length; j++) {
-                if (b.tile(i,j) == null) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return TileUtils.some(Objects::isNull, b);
     }
 
     /**
@@ -206,19 +202,8 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
-        int board_length = b.size();
-        for (int i = 0; i < board_length; i++) {
-            for (int j = 0; j < board_length; j++) {
-                if (b.tile(i,j) != null && b.tile(i,j).value() == MAX_PIECE) {
-                    return true;
-                }
-
-            }
-
-        }
-            return false;}
-
+        return TileUtils.some(tile -> tile != null && tile.value() == MAX_PIECE, b);
+    }
 
     /**
      * Returns true if there are any valid moves on the board.
@@ -227,48 +212,70 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
-       boolean hasEmptySpace = emptySpaceExists((b));
-       int board_length = b.size();
-
-        if (hasEmptySpace) {
-         return true;
-        } else{
-            for (int i = 0; i < board_length; i++) {
-                for (int j = 0; j < board_length; j++) {
-                    if (i-1 >= 0 ) {
-                        if(b.tile(i,j).value() == b.tile(i-1,j).value() ){
-                            return true;
-                            }
-                    }
-
-                    if (i+1 < board_length) {
-                        if( b.tile(i,j).value() == b.tile(i+1,j).value()){
-                            return true;
-                            }
-                    }
-                    if (j-1 >= 0 ) {
-                        if(b.tile(i,j).value() == b.tile(i,j-1).value()){
-                            return true;
-                        }
-                    }
-                    if (j+1 < board_length ) {
-                        if(b.tile(i,j).value() == b.tile(i,j+1).value()){
-                            return true;
-                        }
-                    }
-
-                }
-
-            }
-
+        if (emptySpaceExists(b)) {
+            return true;
         }
-        return false;
+        Predicate<Tile> hasAdjacentTileWithSameValue = (Tile tile) -> {
+            for (Coordinate coordinate : getAdjacentCoordinates(tile, b)) {
+                Tile adjacentTile = b.tile(coordinate.col, coordinate.row);
+                if (tile.value() == adjacentTile.value()) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        return TileUtils.some(hasAdjacentTileWithSameValue, b);
+    }
+
+    private static Coordinate[] getAdjacentCoordinates(Tile tile, Board b) {
+        int col = tile.col();
+        int row = tile.row();
+        Coordinate[] coordinates = Coordinate.of(new int[][]{
+                {col, row + 1}, {col + 1, row},
+                {col, row - 1}, {col - 1, row}
+        });
+        return Arrays.stream(coordinates).filter(coordinate -> isValidCoordinate(coordinate, b)).toArray(Coordinate[]::new);
+    }
+
+    private static boolean isValidCoordinate(Coordinate coordinate, Board b) {
+        int col = coordinate.col;
+        int row = coordinate.row;
+        return col >= 0 && col < b.size() && row >= 0 && row < b.size();
+    }
+
+    private static class Coordinate {
+        int col;
+        int row;
+        public Coordinate(int c, int r) {
+            col = c;
+            row = r;
+        }
+        public static Coordinate[] of(int[][] values) {
+            Coordinate[] coordinates = new Coordinate[values.length];
+            for (int i = 0; i < values.length; i++) {
+                int[] coordinate = values[i];
+                coordinates[i] = new Coordinate(coordinate[0], coordinate[1]);
+            }
+            return coordinates;
+        }
+    }
+
+    private static class TileUtils {
+        public static boolean some(Predicate<Tile> tilePredicate, Board b) {
+            for (int col = 0; col < b.size(); col++) {
+                for (int row = 0; row < b.size(); row++) {
+                    if (tilePredicate.test(b.tile(col, row))) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
 
     @Override
-     /** Returns the model as a string, used for debugging. */
+    /** Returns the model as a string, used for debugging. */
     public String toString() {
         Formatter out = new Formatter();
         out.format("%n[%n");

@@ -18,6 +18,9 @@ import java.util.Arrays;
 import java.util.Formatter;
 import java.util.List;
 
+import static gitlet.Repository.COMMITS_DIR;
+import static gitlet.Repository.GITLET_DIR;
+
 
 /** Assorted utilities.
  *
@@ -236,4 +239,23 @@ class Utils {
         System.out.printf(msg, args);
         System.out.println();
     }
+    public void write_commit(Commit cur) throws IOException {
+        String commitID = commitSh1ID(cur);
+        File commitSnap = join(COMMITS_DIR, commitID);
+        writeObject(commitSnap, cur);
+    }
+    public String fileSh1ID(File file) {
+        byte[] toStaged_byte = readContents(file);
+        return sha1((Object) toStaged_byte);
+    }
+
+    public String commitSh1ID(Commit commit) throws IOException {
+        File commitFile = join(GITLET_DIR, "commit");
+        commitFile.createNewFile();
+        writeObject(commitFile, commit);
+        String commitID = fileSh1ID(commitFile);
+        commitFile.delete();
+        return commitID;
+    }
+
 }
