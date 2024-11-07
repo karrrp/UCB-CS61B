@@ -17,7 +17,7 @@ public class Commit implements Serializable {
     private Date date;
     private String message;
     /** The file this commit pointing. */
-    public HashMap<String,String> committed;
+    private HashMap<String,String> committed;
     /** Dangling Javadoc commen.
      * clone the head commit
      * change the file tracking by stage
@@ -48,6 +48,9 @@ public class Commit implements Serializable {
             staged.clear_removal();
         }
     }
+    public HashMap <String, String> getCommitted() {
+        return committed;
+    }
     public boolean hasFile(String fileName) {
         return committed.containsKey(fileName);
     }
@@ -65,6 +68,4 @@ public class Commit implements Serializable {
         sdf.setTimeZone(TimeZone.getTimeZone("GMT-08:00"));
         System.out.println("Date: " + sdf.format(date));
     }
-    /* TODO: fill in the rest of this class. */
-
 }

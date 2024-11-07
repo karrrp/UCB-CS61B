@@ -9,7 +9,7 @@ public class Main {
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
     public static void main(String[] args) throws IOException {
-        // TODO: what if args is empty?
+        // if args is empty
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;
@@ -69,22 +69,24 @@ public class Main {
             case "reset":
                 validateNumArgs(args, 2);
                 gitlet.reset(args[1]);
+                break;
             case "merge":
                 validateNumArgs(args, 2);
                 gitlet.merge(args[1]);
+                break;
             default:
                 System.out.println("No command with that name exists.");
         }
     }
 
 
-/**
- * Checks the number of arguments versus the expected number,
- * throws a RuntimeException if they do not match.
- *
- * @param args Argument array from command line
- * @param n Number of expected arguments
- */
+    /**
+     * Checks the number of arguments versus the expected number,
+     * throws a RuntimeException if they do not match.
+     *
+     * @param args Argument array from command line
+     * @param n Number of expected arguments
+     */
     public static void validateNumArgs(String[] args, int n) {
         if (GITLET_DIR.exists()) {
             if (args.length != n) {

@@ -153,7 +153,7 @@ public class Repository {
         /*检查add的文件是不是和当前commit追踪的文件相同
         * 如果有，不add
         * 并且检查缓存区是否有这个文件，有则删除*/
-        if (bolbsID.equals(curCommit.committed.get(fileName))) {
+        if (bolbsID.equals(curCommit.getCommitted().get(fileName))) {
             curStaged.staged.remove(fileName);
         } else {
             /*是否bolbs已经有了这个文件版本，没有就创建一个*/
@@ -210,10 +210,10 @@ public class Repository {
         /* check if the file been staged or be tracked*/
         Stage curStaged = readObject(staged, Stage.class);
         Commit headCommit = readObject(headToFile(), Commit.class);
-        if (!curStaged.staged.containsKey(fileName) && !headCommit.committed.containsKey(fileName)) {
+        if (!curStaged.staged.containsKey(fileName) && !headCommit.getCommitted().containsKey(fileName)) {
             System.out.println("No reason to remove the file.");
             return;
-        } else if (headCommit.committed.containsKey(fileName)) {
+        } else if (headCommit.getCommitted().containsKey(fileName)) {
             File rmFile = join(CWD, fileName);
             if (!rmFile.delete() && rmFile.exists()) {
                 throw new RuntimeException("Failed to delete: fileName");
@@ -290,7 +290,7 @@ public class Repository {
             /* 遍历并删除所有该删的文件，当前分支中跟踪但不存在于签出分支中的任何文件都将被删除*/
             removeFile(headCommit, branchCommit);
             /*重写阶段*/
-            for (String name: branchCommit.committed.keySet()) {
+            for (String name: branchCommit.getCommitted().keySet()) {
                 checkoutHead(name, commitSh1ID(branchCommit));
             }
             /*清理缓存区*/
@@ -311,10 +311,10 @@ public class Repository {
             File file = join(CWD, fName);
             if (file.exists()) {
                 /*当前没有但是在工作文件会被重写*/
-                if (!headCommit.committed.containsKey(file.getName()) && branchCommit.committed.containsKey(file.getName())) {
+                if (!headCommit.getCommitted().containsKey(file.getName()) && branchCommit.getCommitted().containsKey(file.getName())) {
                     System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                     System.exit(1);
-                } else if (headCommit.committed.containsKey(file.getName()) && !branchCommit.committed.containsKey(file.getName())) {
+                } else if (headCommit.getCommitted().containsKey(file.getName()) && !branchCommit.getCommitted().containsKey(file.getName())) {
                     if (!file.delete() && file.exists()) {
                         throw new RuntimeException("Fail to delete file");
                     }
@@ -329,7 +329,7 @@ public class Repository {
             System.out.println("No commit with that id exists.");
         } else {
             removeFile(headCommit, resetCommit);
-            for (String name: resetCommit.committed.keySet()) {
+            for (String name: resetCommit.getCommitted().keySet()) {
                 checkoutHead(name, commitSh1ID(resetCommit));
             }
             /*清理缓存区*/
@@ -373,11 +373,11 @@ public class Repository {
             System.exit(1);
         } else {
             /*分割点有的文件*/
-            for (String FileName : splitCommit.committed.keySet()) {
+            for (String FileName : splitCommit.getCommitted().keySet()) {
                 String commitUID = splitCommit.getTrackedFileSId(FileName);
                 /*检测当前提交状态*/
                 /*没有追踪这个文件*/
-                if (!curCommit.committed.containsKey(FileName)) {
+                if (!curCommit.getCommitted().containsKey(FileName)) {
                     /*分割点有，当前头没有追踪这个文件，分支头文件改了，merge*/
                     if (!branchHeadCommit.getTrackedFileSId(FileName).equals(commitUID)) {
                         /*merge*/
@@ -388,12 +388,12 @@ public class Repository {
                             System.exit(1);
                         }
                     }
-                } else if (curCommit.committed.get(FileName).equals(commitUID)) {
+                } else if (curCommit.getCommitted().get(FileName).equals(commitUID)) {
                     /*分割点有，当前头提交未更改*/
-                    if (!branchHeadCommit.committed.containsKey(FileName)) {
+                    if (!branchHeadCommit.getCommitted().containsKey(FileName)) {
                         /*分割点有，当前头提交未更改,分支删除了————删除当前目录的该文件，并且rm 该文件*/
                         rm(FileName);
-                    } else if (!branchHeadCommit.committed.get(FileName).equals(commitUID)) {
+                    } else if (!branchHeadCommit.getCommitted().get(FileName).equals(commitUID)) {
                         /*分割点有，当前头提交未更改,分支更改了————checkout该文件，并暂存*/
                         checkoutHead(FileName, commitSh1ID(branchHeadCommit));
                         add(FileName);
@@ -401,10 +401,10 @@ public class Repository {
                 } else {
                     /*分割点有，当前头提交更改,分支未更改————保持原样*/
                     /*分割点有，当前头提交更改,分支更改或者删除————merge*/
-                    if (!branchHeadCommit.committed.containsKey(FileName)) {
+                    if (!branchHeadCommit.getCommitted().containsKey(FileName)) {
                         /*merge*/
                         mergeFile(FileName, branchHeadCommit.getTrackedFileSId(FileName));
-                    } else if (!branchHeadCommit.committed.get(FileName).equals(commitUID)) {
+                    } else if (!branchHeadCommit.getCommitted().get(FileName).equals(commitUID)) {
                         /*merge*/
                         mergeFile(FileName, branchHeadCommit.getTrackedFileSId(FileName));
                     }
@@ -414,8 +414,8 @@ public class Repository {
                 /*只在给定分支的,check并且检出，类似与check_merge*/
                 for (String onlyBranch : findOnlyTrackedByBranch(branchName).keySet()) {
                     File newFile = join(CWD, onlyBranch);
-                    if (curCommit.committed.containsKey(onlyBranch)) {
-                        mergeFile(onlyBranch,  branchHeadCommit.committed.get(onlyBranch));
+                    if (curCommit.getCommitted().containsKey(onlyBranch)) {
+                        mergeFile(onlyBranch,  branchHeadCommit.getCommitted().get(onlyBranch));
                     } else if (newFile.exists()) {
                         System.out.println("There is an untracked file in the way; delete it, or add and commit it first.There is an untracked file in the way; delete it, or add and commit it first.");
                         System.exit(1);
@@ -448,7 +448,7 @@ public class Repository {
         }
         StringBuilder headContent = new StringBuilder();
         Commit curCommit = readObject(headToFile(), Commit.class);
-        File curCommitBolbs = join(BOLBS_DIR, curCommit.committed.get(FileName));
+        File curCommitBolbs = join(BOLBS_DIR, curCommit.getCommitted().get(FileName));
         Scanner headScanner = new Scanner(curCommitBolbs);
         while (headScanner.hasNextLine()) {
             headContent.append(headScanner.nextLine()).append("\n");
@@ -471,8 +471,8 @@ public class Repository {
     private HashMap<String, String> findOnlyTrackedByBranch(String branchName) throws IOException {
         Commit splitCommit = splitCommit(branchName);
         File branchHeadFile = join(BRANCHES_DIR, branchName);
-        HashMap<String, String> kanye = readObject(branchHeadFile, Commit.class).committed;
-        for (String FileName : splitCommit.committed.keySet()) {
+        HashMap<String, String> kanye = readObject(branchHeadFile, Commit.class).getCommitted();
+        for (String FileName : splitCommit.getCommitted().keySet()) {
             kanye.remove(FileName);
         }
         return kanye;
