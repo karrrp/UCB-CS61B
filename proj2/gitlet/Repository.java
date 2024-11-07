@@ -26,28 +26,47 @@ public class Repository {
     }
     /**设立持久性*/
     private  void setPersistence() {
-        GITLET_DIR.mkdir();
-        BRANCHES_DIR.mkdir();
-        OBJECTS_DIR.mkdir();
-        BOLBS_DIR.mkdir();
-        COMMITS_DIR.mkdir();
-        try {
-            master.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (!GITLET_DIR.mkdir() && !GITLET_DIR.exists()) {
+            throw new RuntimeException("Failed to create directory: GITLET_DIR");
         }
-        try {
-            head.createNewFile();
-            writeContents(head,master.getName());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (!BRANCHES_DIR.mkdir() && !BRANCHES_DIR.exists()) {
+            throw new RuntimeException("Failed to create directory: BRANCHES_DIR");
         }
+        if (!OBJECTS_DIR.mkdir() && !OBJECTS_DIR.exists()) {
+            throw new RuntimeException("Failed to create directory: OBJECTS_DIR");
+        }
+        if (!BOLBS_DIR.mkdir() && !BOLBS_DIR.exists()) {
+            throw new RuntimeException("Failed to create directory: BOLBS_DIR");
+        }
+        if (!COMMITS_DIR.mkdir() && !COMMITS_DIR.exists()) {
+            throw new RuntimeException("Failed to create directory: COMMITS_DIR");
+        }
+
+        try {
+            if (!master.createNewFile() && !master.exists()) {
+                throw new RuntimeException("Failed to create file: master");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create file: master", e);
+        }
+
+        try {
+            if (!head.createNewFile() && !head.exists()) {
+                throw new RuntimeException("Failed to create file: master");
+            }
+            writeContents(head, master.getName());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create file: head", e);
+        }
+
         try {
             Stage a = new Stage();
-            staged.createNewFile();
+            if (!staged.createNewFile() && !staged.exists()) {
+                throw new RuntimeException("Failed to create file: staged");
+            }
             writeObject(staged, a);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to create file: staged", e);
         }
     }
 /** 建立git库 */
@@ -140,7 +159,9 @@ public class Repository {
             /*是否bolbs已经有了这个文件版本，没有就创建一个*/
             File theBolbs = join(BOLBS_DIR, bolbsID);
             if (!theBolbs.exists()) {
-                theBolbs.createNewFile();
+                if (!theBolbs.createNewFile() && !theBolbs.exists()) {
+                    throw new RuntimeException("Failed to create file: theBolbs");
+                }
                 /*在bolbs树里储存这个文件版本*/
                 copyFile(toStagedCWDfile, theBolbs);
             }
@@ -194,7 +215,9 @@ public class Repository {
             return;
         } else if (headCommit.committed.containsKey(fileName)) {
             File rmFile = join(CWD, fileName);
-            rmFile.delete();
+            if (!rmFile.delete() && rmFile.exists()) {
+                throw new RuntimeException("Failed to delete: fileName");
+            }
             curStaged.removal.add(fileName);
         }
         curStaged.rm(fileName);
@@ -203,7 +226,7 @@ public class Repository {
      * @param branchName the name of new branch */
     public void branch(String branchName) {
         if(plainFilenamesIn(GITLET_DIR) != null) {
-            for (String i : plainFilenamesIn(GITLET_DIR)) {
+            for (String i : Objects.requireNonNull(plainFilenamesIn(GITLET_DIR))) {
                 if (i.equals(branchName)) {
                     System.out.println("A branch with that name already exists.");
                     return;
@@ -212,7 +235,9 @@ public class Repository {
             /*track the commit as master */
             File newBranch = join(BRANCHES_DIR, branchName);
             try {
-                newBranch.createNewFile();
+                if (!newBranch.createNewFile() && !newBranch.exists()) {
+                    throw new RuntimeException("Failed to create file: newBranch");
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -225,7 +250,7 @@ public class Repository {
      * @param commitSId 要回溯的提交
      * 给出文件名和指定的提交，用指定提交的文件
      * 覆盖已存在的文件版本（如果存在）*/
-    public void checkoutHead(String fileName, String commitSId) throws IOException {
+    public void checkoutHead(String fileName, String commitSId) {
         Commit commit = (commitSId.equals("head"))? readObject(headToFile(), Commit.class):findCommit(commitSId);
         if (commit != null) {
             if (commit.hasFile(fileName)) {
@@ -235,7 +260,9 @@ public class Repository {
                 File workingFile = join(CWD, fileName);
                 if (!workingFile.exists()) {
                     try {
-                        workingFile.createNewFile();
+                        if (!workingFile.createNewFile() && !workingFile.exists()) {
+                            throw new RuntimeException("Fail to create file ");
+                        }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -288,7 +315,9 @@ public class Repository {
                     System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                     System.exit(1);
                 } else if (headCommit.committed.containsKey(file.getName()) && !branchCommit.committed.containsKey(file.getName())) {
-                    file.delete();
+                    if (!file.delete() && file.exists()) {
+                        throw new RuntimeException("Fail to delete file");
+                    }
                 }
             }
         }
@@ -321,7 +350,9 @@ public class Repository {
             System.out.println("Cannot remove the current branch.");
         } else {
             File rmBranchName = join(BRANCHES_DIR, branchName);
-            rmBranchName.delete();
+            if (!rmBranchName.delete() && rmBranchName.exists()) {
+                throw new RuntimeException("Fail to delete file");
+            }
         }
     }
     /**r合并分支，更改当前目录，创建一个新的commit*/
@@ -390,7 +421,9 @@ public class Repository {
                         System.exit(1);
                     } else {
                         /*当前没有这个文件，给定提交有，检出并缓存*/
-                        newFile.createNewFile();
+                        if(!newFile.createNewFile() && !newFile.exists()) {
+                            throw new RuntimeException("Fail to create file newFile");
+                        }
                         File bolbs = join(BOLBS_DIR, branchHeadCommit.getTrackedFileSId(onlyBranch));
                         copyFile(bolbs, newFile);
                     }
@@ -406,7 +439,9 @@ public class Repository {
         Scanner scanner = new Scanner(branchBolbs);
         File file = join(CWD, FileName);
         if (!file.exists()) {
-            file.createNewFile();
+            if (!file.createNewFile()) {
+                System.err.println("Failed to create directory: " + file.getPath());
+            }
         }
         while (scanner.hasNextLine()) {
             fileContent.append(scanner.nextLine()).append("\n");
@@ -427,7 +462,7 @@ public class Repository {
             writer.write(fileContent.toString());
             writer.write(">>>>>>>");
         } catch (IOException e) {
-            e.printStackTrace();  // 异常处理
+            throw new RuntimeException("Fail to crete writer"); // 异常处理
         }
     }
 
@@ -501,10 +536,14 @@ public class Repository {
     /**Return the SID with the commit */
     static String commitSh1ID(Commit commit) throws IOException {
         File commitFile = join(GITLET_DIR, "commit");
-        commitFile.createNewFile();
+        if (!commitFile.createNewFile() && !commitFile.exists()) {
+            throw new RuntimeException("Fail to create commitFile");
+        }
         writeObject(commitFile, commit);
         String commitID = fileSh1ID(commitFile);
-        commitFile.delete();
+        if (!commitFile.delete() && commitFile.exists()) {
+            throw new RuntimeException("Fail to delete");
+        }
         return commitID;
     }
     /**return the commit with the SID*/
@@ -544,7 +583,7 @@ public class Repository {
                 fos.write(buffer, 0, length);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Fail to copy File");
         }
     }
 }

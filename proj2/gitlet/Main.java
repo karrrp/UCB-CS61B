@@ -1,15 +1,10 @@
 package gitlet;
-import java.io.File;
 import java.io.IOException;
 import static gitlet.Repository.GITLET_DIR;
-import static gitlet.Utils.join;
-
 /** Driver class for Gitlet, a subset of the Git version-control system.
- *  @author TODO
+ *  @author chen
  */
 public class Main {
-
-    File gitletRepo = join(GITLET_DIR, "this");
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
@@ -23,35 +18,35 @@ public class Main {
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
-                validateNumArgs("init", args, 1);
+                validateNumArgs(args, 1);
                 gitlet.init();
                 break;
             case "add":
-                validateNumArgs("add", args, 2);
+                validateNumArgs(args, 2);
                 gitlet.add(args[1]);
                 break;
             case "rm":
-                validateNumArgs("rm", args, 2);
+                validateNumArgs(args, 2);
                 gitlet.rm(args[1]);
                 break;
             case "commit":
-                validateNumArgs("commit", args, 2);
+                validateNumArgs(args, 2);
                 gitlet.commit(args[1]);
                 break;
             case "log":
-                validateNumArgs("log", args, 1);
+                validateNumArgs(args, 1);
                 gitlet.log();
                 break;
             case "global-log":
-                validateNumArgs("global-log", args, 1);
+                validateNumArgs(args, 1);
                 gitlet.global_log();
                 break;
             case "find":
-                validateNumArgs("find", args, 2);
+                validateNumArgs(args, 2);
                 gitlet.find(args[1]);
                 break;
             case "status":
-                validateNumArgs("status", args, 1);
+                validateNumArgs(args, 1);
                 gitlet.status();
                 break;
             case "checkout":
@@ -64,16 +59,19 @@ public class Main {
                 }
                 break;
             case "branch":
-                validateNumArgs("branch", args,2);
+                validateNumArgs(args,2);
                 gitlet.branch(args[2]);
                 break;
             case "rm-branch":
-                validateNumArgs("rm-branch", args, 2);
+                validateNumArgs(args, 2);
                 gitlet.rm_branch(args[1]);
                 break;
             case "reset":
-                validateNumArgs("reset", args, 2);
+                validateNumArgs(args, 2);
                 gitlet.reset(args[1]);
+            case "merge":
+                validateNumArgs(args, 2);
+                gitlet.merge(args[1]);
             default:
                 System.out.println("No command with that name exists.");
         }
@@ -84,11 +82,10 @@ public class Main {
  * Checks the number of arguments versus the expected number,
  * throws a RuntimeException if they do not match.
  *
- * @param cmd Name of command you are validating
  * @param args Argument array from command line
  * @param n Number of expected arguments
  */
-    public static void validateNumArgs(String cmd, String[] args, int n) {
+    public static void validateNumArgs(String[] args, int n) {
         if (GITLET_DIR.exists()) {
             if (args.length != n) {
                 throw new RuntimeException("Incorrect operands.");

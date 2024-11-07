@@ -1,20 +1,11 @@
 package gitlet;
-// TODO: any imports you need here
-
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date; // TODO: You'll likely use this in this class
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import static gitlet.Utils.join;
-import static gitlet.Utils.readObject;
-
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
@@ -22,10 +13,6 @@ import static gitlet.Utils.readObject;
  *  @author chen
  */
 public class Commit implements Serializable {
-    public static final File CWD = new File(System.getProperty("user.dir"));
-    /** The .gitlet's directory. */
-    public static final File GITLET_DIR = join(CWD, ".gitlet");
-    /** The message of this Commit. */
     private String parent;
     private Date date;
     private String message;
@@ -66,9 +53,6 @@ public class Commit implements Serializable {
     }
     public String getTrackedFileSId(String fileName) {
         return committed.get(fileName);
-    }
-    public Date commitDate() {
-        return date;
     }
     public String getParent() {
         return parent;
