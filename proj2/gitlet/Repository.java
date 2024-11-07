@@ -189,20 +189,25 @@ public class Repository {
     }
     private void print_stage() {
         Stage stage = readObject(staged, Stage.class);
+        System.out.println("=== Staged Files ===");
         if (!stage.staged.isEmpty()) {
-            System.out.println("=== Staged Files ===");
             for(String fileName : stage.staged.keySet()) {
                 System.out.println(fileName);
             }
-            System.out.println(" ");
         }
-        System.out.println("=== Removal Files ===");
+        System.out.println("\n=== Removal Files ===");
         if (!stage.removal.isEmpty()) {
             for(String fileName : stage.removal) {
                 System.out.println(fileName);
             }
-            System.out.println(" ");
         }
+        System.out.println(" ");
+    }
+    private void print_ModificationsNoCommit() {
+        System.out.println("=== Modifications Not Staged For Commit ===\n");
+    }
+    private void printUntrackedFiles() {
+        System.out.println("=== Untracked Files ===\n");
     }
     /**如果当前commit跟踪了这个文件，那么删除当前目录的这个文件。并把这个文件缓存到removal区，下一次commit不在跟踪这个文件
      * 如果这个文件名在缓存区也要去去掉*/
