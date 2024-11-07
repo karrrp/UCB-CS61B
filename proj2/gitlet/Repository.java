@@ -433,14 +433,23 @@ public class Repository {
         }
     }
     /** 把两个文件融合**/
-    private void mergeFile(String FileName, String branchFileUID) throws IOException {
+    private void mergeFile(String FileName, String branchFileUID) {
         File branchBolbs = join(BOLBS_DIR, branchFileUID);
         StringBuilder fileContent = new StringBuilder();
-        Scanner scanner = new Scanner(branchBolbs);
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(branchBolbs);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         File file = join(CWD, FileName);
         if (!file.exists()) {
-            if (!file.createNewFile()) {
-                System.err.println("Failed to create directory: " + file.getPath());
+            try {
+                if (!file.createNewFile()) {
+                    System.err.println("Failed to create directory: " + file.getPath());
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
         while (scanner.hasNextLine()) {
@@ -449,7 +458,12 @@ public class Repository {
         StringBuilder headContent = new StringBuilder();
         Commit curCommit = readObject(headToFile(), Commit.class);
         File curCommitBolbs = join(BOLBS_DIR, curCommit.getCommitted().get(FileName));
-        Scanner headScanner = new Scanner(curCommitBolbs);
+        Scanner headScanner = null;
+        try {
+            headScanner = new Scanner(curCommitBolbs);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         while (headScanner.hasNextLine()) {
             headContent.append(headScanner.nextLine()).append("\n");
         }
@@ -468,8 +482,9 @@ public class Repository {
 
 
     /**得到只有给定分支追踪的文件**/
-    private HashMap<String, String> findOnlyTrackedByBranch(String branchName) throws IOException {
-        Commit splitCommit = splitCommit(branchName);
+    private HashMap<String, String> findOnlyTrackedByBranch(String branchName) {
+        Commit splitCommit = null;
+        splitCommit = splitCommit(branchName);
         File branchHeadFile = join(BRANCHES_DIR, branchName);
         HashMap<String, String> kanye = readObject(branchHeadFile, Commit.class).getCommitted();
         for (String FileName : splitCommit.getCommitted().keySet()) {
@@ -478,14 +493,22 @@ public class Repository {
         return kanye;
     }
 /**通过分支头和当前节点提交找到第一个祖先节点*/
-    private Commit splitCommit(String branchName) throws IOException {
+    private Commit splitCommit(String branchName) {
         File branchHeadFile = join(BRANCHES_DIR, branchName);
         Commit branchHeadCommit = readObject(branchHeadFile, Commit.class);
         Commit curCommit = readObject(headToFile(), Commit.class);
         /*建立一个集合来记录，第一个祖先*/
         HashSet<String> commitsInDegree = new HashSet<>();
-        commitsInDegree.add(commitSh1ID(branchHeadCommit));
-        commitsInDegree.add(commitSh1ID(curCommit));
+        try {
+            commitsInDegree.add(commitSh1ID(branchHeadCommit));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            commitsInDegree.add(commitSh1ID(curCommit));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         /*开始头提交的遍历，从它的父母开始，如果碰见标记了的一定是分支节点，这是因为我们首次遍历集合里除了当前头只有分支了*/
         String pointID = curCommit.getParent();
         while (pointID != null && !commitsInDegree.contains(pointID)) {

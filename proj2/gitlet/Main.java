@@ -8,7 +8,7 @@ public class Main {
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args){
         // if args is empty
         if (args.length == 0) {
             System.out.println("Please enter a command.");
@@ -19,11 +19,19 @@ public class Main {
         switch(firstArg) {
             case "init":
                 validateNumArgs(args, 1);
-                gitlet.init();
+                try {
+                    gitlet.init();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             case "add":
                 validateNumArgs(args, 2);
-                gitlet.add(args[1]);
+                try {
+                    gitlet.add(args[1]);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             case "rm":
                 validateNumArgs(args, 2);
@@ -31,7 +39,11 @@ public class Main {
                 break;
             case "commit":
                 validateNumArgs(args, 2);
-                gitlet.commit(args[1]);
+                try {
+                    gitlet.commit(args[1]);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             case "log":
                 validateNumArgs(args, 1);
@@ -55,7 +67,11 @@ public class Main {
                 } else if (args.length == 4 && args[2].equals("--")) {
                     gitlet.checkoutHead(args[3], args[1]);
                 } else if (args.length == 2) {
-                    gitlet.checkoutBranch(args[1]);
+                    try {
+                        gitlet.checkoutBranch(args[1]);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
                 break;
             case "branch":
@@ -68,11 +84,19 @@ public class Main {
                 break;
             case "reset":
                 validateNumArgs(args, 2);
-                gitlet.reset(args[1]);
+                try {
+                    gitlet.reset(args[1]);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             case "merge":
                 validateNumArgs(args, 2);
-                gitlet.merge(args[1]);
+                try {
+                    gitlet.merge(args[1]);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             default:
                 System.out.println("No command with that name exists.");
