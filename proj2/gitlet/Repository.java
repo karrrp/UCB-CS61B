@@ -175,6 +175,8 @@ public class Repository {
         /*print the branches*/
         print_Branch();
         print_stage();
+        print_ModificationsNoCommit();
+        printUntrackedFiles();
     }
     private void print_Branch() {
         System.out.println("=== Branches ===");
