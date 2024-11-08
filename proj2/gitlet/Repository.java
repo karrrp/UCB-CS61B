@@ -10,7 +10,6 @@ import static gitlet.Utils.*;
  */
 public class Repository {
     public static final File CWD = new File(System.getProperty("user.dir"));
-    /** The .gitlet's directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
     public static final File staged = join(GITLET_DIR, "stage");
     public static final File BRANCHES_DIR = join(GITLET_DIR, "branch");
@@ -154,7 +153,7 @@ public class Repository {
         * 如果有，不add
         * 并且检查缓存区是否有这个文件，有则删除*/
         if (bolbsID.equals(curCommit.getCommitted().get(fileName))) {
-            curStaged.staged.remove(fileName);
+            curStaged.rmFileInAddition(fileName);
         } else {
             /*是否bolbs已经有了这个文件版本，没有就创建一个*/
             File theBolbs = join(BOLBS_DIR, bolbsID);
@@ -166,7 +165,7 @@ public class Repository {
                 copyFile(toStagedCWDfile, theBolbs);
             }
             /*把这个文件存到暂存区*/
-            curStaged.add(fileName);
+            curStaged.stagedForAddition(fileName);
         }
         writeObject(staged, curStaged);
     }
@@ -192,17 +191,9 @@ public class Repository {
     private void print_stage() {
         Stage stage = readObject(staged, Stage.class);
         System.out.println("=== Staged Files ===");
-        if (!stage.staged.isEmpty()) {
-            for(String fileName : stage.staged.keySet()) {
-                System.out.println(fileName);
-            }
-        }
+        stage.printAddition();
         System.out.println("\n=== Removal Files ===");
-        if (!stage.removal.isEmpty()) {
-            for(String fileName : stage.removal) {
-                System.out.println(fileName);
-            }
-        }
+        stage.printRemoval();
         System.out.println(" ");
     }
     private void print_ModificationsNoCommit() {
@@ -217,7 +208,7 @@ public class Repository {
         /* check if the file been staged or be tracked*/
         Stage curStaged = readObject(staged, Stage.class);
         Commit headCommit = readObject(headToFile(), Commit.class);
-        if (!curStaged.staged.containsKey(fileName) && !headCommit.getCommitted().containsKey(fileName)) {
+        if (!curStaged.containKeyInAddition(fileName) && !headCommit.getCommitted().containsKey(fileName)) {
             System.out.println("No reason to remove the file.");
             return;
         } else if (headCommit.getCommitted().containsKey(fileName)) {
@@ -225,9 +216,10 @@ public class Repository {
             if (!rmFile.delete() && rmFile.exists()) {
                 throw new RuntimeException("Failed to delete: fileName");
             }
-            curStaged.removal.add(fileName);
+            curStaged.stagedForRemoval(fileName);
         }
-        curStaged.rm(fileName);
+        curStaged.rmFileInAddition(fileName);
+        writeObject(staged, curStaged);
     }
     /**create a new branch
      * @param branchName the name of new branch */
@@ -304,6 +296,7 @@ public class Repository {
             Stage stage = readObject(staged, Stage.class);
             stage.clear_staged();
             stage.clear_removal();
+            writeObject(staged, stage);
             /*更改当前指针*/
             writeContents(head, branchName);
 
@@ -344,6 +337,7 @@ public class Repository {
             stage.clear_staged();
             stage.clear_removal();
             writeObject(headToFile(),resetCommit);
+            writeObject(staged, stage);
         }
     }
 

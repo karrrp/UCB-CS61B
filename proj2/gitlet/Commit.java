@@ -6,6 +6,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import static gitlet.Utils.writeObject;
+
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
@@ -29,7 +32,7 @@ public class Commit implements Serializable {
                 date = new Date(0);
             this.parent = null;
             this.committed = new HashMap<>();
-        } else if (staged.staged == null && staged.removal == null) {
+        } else if (staged.isEmpty()) {
             System.out.println("There nothing to commit");
         } else {
             parent = Repository.commitSh1ID(head);
@@ -38,15 +41,18 @@ public class Commit implements Serializable {
             /* 读出并克隆 */
             this.committed = head.committed;
             /* 清除stage的文件，添加到commit里面 */
-            for (String key : staged.staged.keySet()) {
-                committed.put(key, staged.staged.get(key));
+            for (String key : staged.getStaged().keySet()) {
+                committed.put(key, staged.getStaged().get(key));
             }
             staged.clear_staged();
-            for (String key : staged.removal) {
+            for (String key : staged.getRemoval()) {
                 committed.remove(key);
             }
             staged.clear_removal();
+            //保存stage
+            writeObject(Repository.staged, staged);
         }
+
     }
     public HashMap <String, String> getCommitted() {
         return committed;
