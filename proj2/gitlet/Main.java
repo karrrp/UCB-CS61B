@@ -76,7 +76,7 @@ public class Main {
                 break;
             case "branch":
                 validateNumArgs(args,2);
-                gitlet.branch(args[2]);
+                gitlet.branch(args[1]);
                 break;
             case "rm-branch":
                 validateNumArgs(args, 2);
