@@ -145,10 +145,19 @@ public class Repository {
      * 先she1此file文件，随后读出commit，读出filename对应的hashcode
      * */
     public void add(String fileName) throws IOException {
+        //是否存在这个文件
         File toStagedCWDfile = join(CWD, fileName);
+        if (!toStagedCWDfile.exists()) {
+            System.out.println("File does not exist.");
+            System.exit(1);
+        }
         String bolbsID = fileSh1ID(toStagedCWDfile);
         Commit curCommit = readObject(headToFile(), Commit.class);
         Stage curStaged = readObject(staged, Stage.class);
+        if (curStaged.containKeyInRemoval(fileName)) {
+            curStaged.getRemoval().remove(fileName);
+            return;
+        }
         /*检查add的文件是不是和当前commit追踪的文件相同
         * 如果有，不add
         * 并且检查缓存区是否有这个文件，有则删除*/
@@ -174,8 +183,8 @@ public class Repository {
         /*print the branches*/
         print_Branch();
         print_stage();
-        print_ModificationsNoCommit();
-        printUntrackedFiles();
+        print_ModificationsNoCommit(readObject(staged, Stage.class));
+        printUntrackedFiles(readObject(staged, Stage.class));
     }
     private void print_Branch() {
         System.out.println("=== Branches ===");
@@ -196,11 +205,58 @@ public class Repository {
         stage.printRemoval();
         System.out.println(" ");
     }
-    private void print_ModificationsNoCommit() {
-        System.out.println("=== Modifications Not Staged For Commit ===\n");
+    private void print_ModificationsNoCommit(Stage stage) {
+        System.out.println("=== Modifications Not Staged For Commit ===");
+        //tracked but unstaged for addition
+        List<String> cwdWorkingDir = plainFilenamesIn(CWD);
+        if (cwdWorkingDir == null) {
+            return;
+        }
+        Commit headCommit = readObject(headToFile(), Commit.class);
+        for (String FileName : cwdWorkingDir) {
+
+            File file = join(CWD, FileName);
+            if (headCommit.hasFile(FileName)) {
+                if (!fileSh1ID(file).equals(headCommit.getFileUID(FileName))) {
+                    System.out.println(FileName);
+                }
+            } else if (stage.containKeyInAddition(FileName)) {
+                if (!fileSh1ID(file).equals(stage.getStaged().get(FileName))) {
+                    System.out.println(FileName);
+                }
+            }
+        }
+        Set<String> stageFile = stage.getStaged().keySet();
+        for (String fileName : stageFile) {
+            File file = join(CWD, fileName);
+            if (!file.exists()) {
+                System.out.println(fileName);
+            }
+        }
+        Set<String> commitFile = headCommit.getCommitted().keySet();
+        for (String fileName : commitFile) {
+            File file = join(CWD, fileName);
+            if (!stageFile.contains(fileName) && !file.exists() && !stage.getRemoval().contains(fileName)) {
+                System.out.println(fileName);
+            }
+        }
+        System.out.println();
     }
-    private void printUntrackedFiles() {
-        System.out.println("=== Untracked Files ===\n");
+    private void printUntrackedFiles(Stage stage) {
+        System.out.println("=== Untracked Files ===");
+        List<String> cwdWorkingDir = plainFilenamesIn(CWD);
+        if (cwdWorkingDir == null) {
+            return;
+        }
+        Commit headCommit = readObject(headToFile(), Commit.class);
+        Set<String> commitFile = headCommit.getCommitted().keySet();
+        Set<String> stageFile = stage.getStaged().keySet();
+        for (String fileName : cwdWorkingDir) {
+            if (!commitFile.contains(fileName) && !stageFile.contains(fileName)) {
+                System.out.println(fileName);
+            }
+        }
+        System.out.println();
     }
     /**如果当前commit跟踪了这个文件，那么删除当前目录的这个文件。并把这个文件缓存到removal区，下一次commit不在跟踪这个文件
      * 如果这个文件名在缓存区也要去去掉*/
@@ -577,10 +633,8 @@ public class Repository {
         }
         File relatedCommit = join(COMMITS_DIR, SID);
         if (relatedCommit.exists()) {
-            return readObject(relatedCommit,Commit.class);
+            return readObject(relatedCommit, Commit.class);
         } else {
-            System.out.println("Found no commit with that message.");
-            System.exit(1);
             return null;
         }
     }

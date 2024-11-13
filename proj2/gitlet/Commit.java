@@ -26,6 +26,10 @@ public class Commit implements Serializable {
      * change the file tracking by stage
      * return the commit object*/
     public Commit(String message, Commit head, Stage staged) throws IOException {
+        if (message.isEmpty()) {
+            System.out.println("Please enter a commit message.");
+            System.exit(1);
+        }
         if (head == null) {
             this.message = "initial commit";
                 // 解析日期字符串
@@ -33,7 +37,8 @@ public class Commit implements Serializable {
             this.parent = null;
             this.committed = new HashMap<>();
         } else if (staged.isEmpty()) {
-            System.out.println("There nothing to commit");
+            System.out.println("No changes added to the commit.");
+            System.exit(1);
         } else {
             parent = Repository.commitSh1ID(head);
             date = new Date();
@@ -59,6 +64,10 @@ public class Commit implements Serializable {
     }
     public boolean hasFile(String fileName) {
         return committed.containsKey(fileName);
+    }
+    public String getFileUID(String fileName) {
+        assert hasFile(fileName);
+        return committed.get(fileName);
     }
     public String getTrackedFileSId(String fileName) {
         return committed.get(fileName);

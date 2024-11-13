@@ -1,18 +1,13 @@
 package gitlet;
 import java.io.File;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import static gitlet.Utils.*;
-
 public class Stage implements Serializable {
     private final TreeMap<String,String> staged = new TreeMap<>();
     private final TreeSet<String> removal = new TreeSet<>();
     private static final File CWD = new File(System.getProperty("user.dir"));
-
     public TreeMap<String, String> getStaged() {
         return staged;
     }
@@ -34,14 +29,11 @@ public class Stage implements Serializable {
     public boolean isEmpty() {
         return staged.isEmpty() && removal.isEmpty();
     }
-    public boolean isAdditionEmpty() {
-        return staged.isEmpty();
-    }
-    public boolean isRemovalEmpty() {
-        return removal.isEmpty();
-    }
     public boolean containKeyInAddition(String fileName) {
         return staged.containsKey(fileName);
+    }
+    public boolean containKeyInRemoval(String fileName) {
+        return removal.contains(fileName);
     }
     /*清除暂存区的的该文件*/
     public void rmFileInAddition(String fileName) {
