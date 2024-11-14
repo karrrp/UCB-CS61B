@@ -149,13 +149,14 @@ public class Repository {
         File toStagedCWDfile = join(CWD, fileName);
         if (!toStagedCWDfile.exists()) {
             System.out.println("File does not exist.");
-            System.exit(1);
+            return;
         }
         String bolbsID = fileSh1ID(toStagedCWDfile);
         Commit curCommit = readObject(headToFile(), Commit.class);
         Stage curStaged = readObject(staged, Stage.class);
         if (curStaged.containKeyInRemoval(fileName)) {
             curStaged.getRemoval().remove(fileName);
+            writeObject(staged, curStaged);
             return;
         }
         /*检查add的文件是不是和当前commit追踪的文件相同
@@ -369,7 +370,7 @@ public class Repository {
                 /*当前没有但是在工作文件会被重写*/
                 if (!headCommit.getCommitted().containsKey(file.getName()) && branchCommit.getCommitted().containsKey(file.getName())) {
                     System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                    System.exit(1);
+                    return;
                 } else if (headCommit.getCommitted().containsKey(file.getName()) && !branchCommit.getCommitted().containsKey(file.getName())) {
                     if (!file.delete() && file.exists()) {
                         throw new RuntimeException("Fail to delete file");
@@ -424,10 +425,8 @@ public class Repository {
         Commit splitCommit = splitCommit(branchName);
         if (splitCommit.equals(branchHeadCommit)) {
             System.out.println("Given branch is an ancestor of the current branch.");
-            System.exit(1);
         } else if (splitCommit.equals(curCommit)) {
             System.out.println("Current branch fast-forwarded.");
-            System.exit(1);
         } else {
             /*分割点有的文件*/
             for (String FileName : splitCommit.getCommitted().keySet()) {
@@ -442,7 +441,7 @@ public class Repository {
                         File file = new File(FileName);
                         if (file.exists()) {
                             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.There is an untracked file in the way; delete it, or add and commit it first.");
-                            System.exit(1);
+                            return;
                         }
                     }
                 } else if (curCommit.getCommitted().get(FileName).equals(commitUID)) {
@@ -590,7 +589,7 @@ public class Repository {
     private void mergeEXPHandle(String branchName) {
         if (!readObject(staged, Stage.class).isEmpty()) {
             System.out.println("You have uncommitted changes.");
-            System.exit(1);
+            return;
         }
         List<String> branchNameList = plainFilenamesIn(BRANCHES_DIR);
         assert branchNameList != null;
