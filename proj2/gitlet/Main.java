@@ -12,7 +12,7 @@ public class Main {
         // if args is empty
         if (args.length == 0) {
             System.out.println("Please enter a command.");
-            return;
+            System.exit(0);
         }
         Repository gitlet = new Repository();
         String firstArg = args[0];
@@ -64,8 +64,13 @@ public class Main {
             case "checkout":
                 if (args.length == 3 && args[1].equals("--")) {
                     gitlet.checkoutHead(args[2], "head");
-                } else if (args.length == 4 && args[2].equals("--")) {
-                    gitlet.checkoutHead(args[3], args[1]);
+                } else if (args.length == 4 ) {
+                    if (args[2].equals("--")) {
+                        gitlet.checkoutHead(args[3], args[1]);
+                    } else {
+                        System.out.println("Incorrect operands.");
+                        System.exit(0);
+                    }
                 } else if (args.length == 2) {
                     try {
                         gitlet.checkoutBranch(args[1]);
@@ -100,6 +105,7 @@ public class Main {
                 break;
             default:
                 System.out.println("No command with that name exists.");
+                System.exit(0);
         }
     }
     /**

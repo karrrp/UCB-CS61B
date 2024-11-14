@@ -25,10 +25,6 @@ public class Commit implements Serializable {
      * change the file tracking by stage
      * return the commit object*/
     public Commit(String message, Commit head, Stage staged) throws IOException {
-        if (message.isEmpty()) {
-            System.out.println("Please enter a commit message.");
-            System.exit(1);
-        }
         if (head == null) {
             this.message = "initial commit";
                 // 解析日期字符串
@@ -37,7 +33,7 @@ public class Commit implements Serializable {
             this.committed = new HashMap<>();
         } else if (staged.isEmpty()) {
             System.out.println("No changes added to the commit.");
-            System.exit(1);
+            throw new RuntimeException("no changes added to the commit");
         } else {
             parent = Repository.commitSh1ID(head);
             date = new Date();
@@ -53,7 +49,7 @@ public class Commit implements Serializable {
                 committed.remove(key);
             }
             staged.clear_removal();
-            //保存stage
+            //stage
             writeObject(Repository.staged, staged);
         }
 

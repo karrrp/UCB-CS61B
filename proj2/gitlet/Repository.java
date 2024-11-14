@@ -18,6 +18,7 @@ public class Repository {
     public static final File COMMITS_DIR = join(OBJECTS_DIR, "commit");
     public static final File master = join(BRANCHES_DIR,"master");
     public static final File head = join(GITLET_DIR, "head");
+    public static final File newBranch = join(GITLET_DIR, "newBranch");
     /**返回头指针文件。保存着序列化后的commit*/
     private File headToFile() {
         String headFilename = readContentsAsString(head);
@@ -47,6 +48,15 @@ public class Repository {
             }
         } catch (IOException e) {
             throw new RuntimeException("Failed to create file: master", e);
+        }
+        try {
+            if (!newBranch.createNewFile() && !newBranch.exists()) {
+                throw new RuntimeException("Failed to create file: newBranch");
+            }
+            simpleSet newBranchSet = new simpleSet();
+            writeObject(newBranch, newBranchSet);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create file: newBranch", e);
         }
 
         try {
@@ -94,7 +104,11 @@ public class Repository {
  * 更新头指针*/
     public void commit(String message) throws IOException {
         /*read the current commit and stage*/
-        Commit headCommit = readObject(headToFile(),Commit.class);
+        if (message.isEmpty()) {
+            System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
+        Commit headCommit = readObject(headToFile(), Commit.class);
         Stage curStaged = readObject(staged, Stage.class);
         Commit curCommit = new Commit(message, headCommit, curStaged);
         /*hand cur commit*/
@@ -149,7 +163,7 @@ public class Repository {
         File toStagedCWDfile = join(CWD, fileName);
         if (!toStagedCWDfile.exists()) {
             System.out.println("File does not exist.");
-            return;
+            System.exit(0);
         }
         String bolbsID = fileSh1ID(toStagedCWDfile);
         Commit curCommit = readObject(headToFile(), Commit.class);
@@ -278,6 +292,10 @@ public class Repository {
         curStaged.rmFileInAddition(fileName);
         writeObject(staged, curStaged);
     }
+    private class simpleSet implements Serializable {
+        public TreeSet<String> set;
+
+    }
     /**create a new branch
      * @param branchName the name of new branch */
     public void branch(String branchName) {
@@ -285,7 +303,7 @@ public class Repository {
             for (String i : Objects.requireNonNull(plainFilenamesIn(GITLET_DIR))) {
                 if (i.equals(branchName)) {
                     System.out.println("A branch with that name already exists.");
-                    return;
+                    System.exit(0);
                 }
             }
             /*track the commit as master */
@@ -299,6 +317,9 @@ public class Repository {
             }
             writeObject(newBranch, readObject(master, Commit.class));
             writeContents(head, branchName);
+            simpleSet a = readObject(newBranch, simpleSet.class);
+            a.set.add(branchName);
+            writeObject(newBranch, a);
         }
     }
     /**
@@ -344,7 +365,7 @@ public class Repository {
             Commit branchCommit = readObject(branch, Commit.class);
             Commit headCommit = readObject(headToFile(), Commit.class);
             /* 遍历并删除所有该删的文件，当前分支中跟踪但不存在于签出分支中的任何文件都将被删除*/
-            removeFile(headCommit, branchCommit);
+            removeFile(headCommit, branchCommit, branchName);
             /*重写阶段*/
             for (String name: branchCommit.getCommitted().keySet()) {
                 checkoutHead(name, commitSh1ID(branchCommit));
@@ -363,15 +384,25 @@ public class Repository {
     }
     /**
      *遍历并删除所有该删的文件，当前分支中跟踪但不存在于签出分支中的任何文件都将被删除*/
-    private void removeFile(Commit headCommit, Commit branchCommit) {
+    private void removeFile(Commit headCommit, Commit branchCommit, String branchName) {
+        simpleSet isBranchNew = readObject(newBranch, simpleSet.class);
+        if (isBranchNew.set.contains(branchName)) {
+            for (String fName : Objects.requireNonNull(plainFilenamesIn(CWD))) {
+                File file = join(CWD, fName);
+                file.delete();
+            }
+            isBranchNew.set.remove(branchName);
+            writeObject(newBranch, isBranchNew);
+        }
         for (String fName : Objects.requireNonNull(plainFilenamesIn(CWD))) {
             File file = join(CWD, fName);
             if (file.exists()) {
                 /*当前没有但是在工作文件会被重写*/
-                if (!headCommit.getCommitted().containsKey(file.getName()) && branchCommit.getCommitted().containsKey(file.getName())) {
+                Stage stage = readObject(staged, Stage.class);
+                if (!headCommit.getCommitted().containsKey(fName) && !stage.containKeyInAddition(fName) && branchCommit.getCommitted().containsKey(fName)) {
                     System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                    return;
-                } else if (headCommit.getCommitted().containsKey(file.getName()) && !branchCommit.getCommitted().containsKey(file.getName())) {
+                    System.exit(0);
+                } else if (headCommit.getCommitted().containsKey(fName) && !branchCommit.getCommitted().containsKey(fName)) {
                     if (!file.delete() && file.exists()) {
                         throw new RuntimeException("Fail to delete file");
                     }
@@ -384,8 +415,9 @@ public class Repository {
         Commit headCommit = readObject(headToFile(), Commit.class);
         if (resetCommit == null) {
             System.out.println("No commit with that id exists.");
+            System.exit(0);
         } else {
-            removeFile(headCommit, resetCommit);
+            removeFile(headCommit, resetCommit, "z45sd4ad");
             for (String name: resetCommit.getCommitted().keySet()) {
                 checkoutHead(name, commitSh1ID(resetCommit));
             }
@@ -397,8 +429,6 @@ public class Repository {
             writeObject(staged, stage);
         }
     }
-
-
     public void rm_branch(String branchName) {
         List<String> branchNameList = plainFilenamesIn(BRANCHES_DIR);
         assert branchNameList != null;
@@ -441,7 +471,7 @@ public class Repository {
                         File file = new File(FileName);
                         if (file.exists()) {
                             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.There is an untracked file in the way; delete it, or add and commit it first.");
-                            return;
+                            System.exit(0);
                         }
                     }
                 } else if (curCommit.getCommitted().get(FileName).equals(commitUID)) {
@@ -474,7 +504,7 @@ public class Repository {
                         mergeFile(onlyBranch,  branchHeadCommit.getCommitted().get(onlyBranch));
                     } else if (newFile.exists()) {
                         System.out.println("There is an untracked file in the way; delete it, or add and commit it first.There is an untracked file in the way; delete it, or add and commit it first.");
-                        System.exit(1);
+                        return;
                     } else {
                         /*当前没有这个文件，给定提交有，检出并缓存*/
                         if(!newFile.createNewFile() && !newFile.exists()) {
@@ -589,7 +619,8 @@ public class Repository {
     private void mergeEXPHandle(String branchName) {
         if (!readObject(staged, Stage.class).isEmpty()) {
             System.out.println("You have uncommitted changes.");
-            return;
+            System.exit(0);
+            System.exit(0);
         }
         List<String> branchNameList = plainFilenamesIn(BRANCHES_DIR);
         assert branchNameList != null;
