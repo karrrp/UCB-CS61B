@@ -10,7 +10,6 @@ import java.util.TimeZone;
 import static gitlet.Utils.writeObject;
 
 /** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
  *  @author chen
@@ -20,7 +19,7 @@ public class Commit implements Serializable {
     private Date date;
     private String message;
     /** The file this commit pointing. */
-    private HashMap<String,String> committed;
+    private HashMap<String, String> committed;
     /** Dangling Javadoc commen.
      * clone the head commit
      * change the file tracking by stage
@@ -33,7 +32,7 @@ public class Commit implements Serializable {
         if (head == null) {
             this.message = "initial commit";
                 // 解析日期字符串
-                date = new Date(0);
+            date = new Date(0);
             this.parent = null;
             this.committed = new HashMap<>();
         } else if (staged.isEmpty()) {

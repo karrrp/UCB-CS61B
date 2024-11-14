@@ -201,7 +201,7 @@ public class Repository {
         Stage stage = readObject(staged, Stage.class);
         System.out.println("=== Staged Files ===");
         stage.printAddition();
-        System.out.println("\n=== Removal Files ===");
+        System.out.println("\n=== Removed Files ===");
         stage.printRemoval();
         System.out.println(" ");
     }

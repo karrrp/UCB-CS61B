@@ -102,8 +102,6 @@ public class Main {
                 System.out.println("No command with that name exists.");
         }
     }
-
-
     /**
      * Checks the number of arguments versus the expected number,
      * throws a RuntimeException if they do not match.
