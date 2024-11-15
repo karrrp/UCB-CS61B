@@ -534,6 +534,7 @@ import static gitlet.Utils.*;
         } catch (IOException e) {
             throw new RuntimeException("Fail to crete writer"); // 异常处理
         }
+        System.out.println("Encountered a merge conflict.");
     }
 
 

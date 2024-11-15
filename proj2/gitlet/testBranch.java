@@ -39,4 +39,30 @@ public class testBranch {
         gitlet.checkoutBranch("master");
         gitlet.merge("other");
     }
+    @Test
+    public void test_rm_branch() throws IOException {
+        Repository gitlet = new Repository();
+        gitlet.init();
+        File ffile = join(Repository.CWD, "f.txt");
+        File gfile = join(Repository.CWD, "g.txt");
+        ffile.createNewFile();
+        gfile.createNewFile();
+        gitlet.add("f.txt");
+        writeContents(ffile,"wug");
+        gitlet.add("g.txt");
+        writeContents(gfile, "not wug");
+        gitlet.commit("first commit", null);
+        gitlet.branch("other");
+        writeContents(ffile, "3wug");
+        gitlet.add("f.txt");
+        gitlet.commit("master change", null);
+        gitlet.checkoutBranch("other");
+        gfile.createNewFile();
+        writeContents(ffile,"2wug");
+        gitlet.add("f.txt");
+        gitlet.commit("change", null);
+        gitlet.checkoutBranch("master");
+        gitlet.merge("other");
+
+    }
 }
