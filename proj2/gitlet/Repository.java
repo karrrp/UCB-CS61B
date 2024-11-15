@@ -299,8 +299,8 @@ import static gitlet.Utils.*;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
             writeObject(branch, readObject(master, Commit.class));
-            writeContents(head, branchName);
             simpleSet a = readObject(newBranch, simpleSet.class);
             a.addBranchName(branchName);
             writeObject(newBranch, a);
