@@ -332,14 +332,24 @@ import static gitlet.Utils.*;
         }
     }
     public void checkoutBranch(String branchName) throws IOException {
-        if (branchName.equals(readContentsAsString(headToFile()))) {
+        String curBranch = readContentsAsString(head);
+        if (branchName.equals(curBranch)) {
             System.out.println("No need to checkout the current branch.");
         } else if (Objects.requireNonNull(plainFilenamesIn(BRANCHES_DIR)).contains(branchName)) {
             File branch = join(BRANCHES_DIR, branchName);
             Commit branchCommit = readObject(branch, Commit.class);
             Commit headCommit = readObject(headToFile(), Commit.class);
+            simpleSet isBranchNew = readObject(newBranch, simpleSet.class);
+            if (isBranchNew.containBranchName(branchName)) {
+                for (String fName : Objects.requireNonNull(plainFilenamesIn(CWD))) {
+                    File file = join(CWD, fName);
+                    file.delete();
+                }
+                isBranchNew.rmBranchName(branchName);
+                writeObject(newBranch, isBranchNew);
+                return;
+            }
             removeFile(headCommit, branchCommit, branchName);
-
             for (String name: branchCommit.getCommitted().keySet()) {
                 checkoutHead(name, commitSh1ID(branchCommit));
             }
@@ -354,15 +364,6 @@ import static gitlet.Utils.*;
         }
     }
     private void removeFile(Commit headCommit, Commit branchCommit, String branchName) {
-        simpleSet isBranchNew = readObject(newBranch, simpleSet.class);
-        if (isBranchNew.containBranchName(branchName)) {
-            for (String fName : Objects.requireNonNull(plainFilenamesIn(CWD))) {
-                File file = join(CWD, fName);
-                file.delete();
-            }
-            isBranchNew.rmBranchName(branchName);
-            writeObject(newBranch, isBranchNew);
-        }
         for (String fName : Objects.requireNonNull(plainFilenamesIn(CWD))) {
             File file = join(CWD, fName);
             if (file.exists()) {
@@ -377,6 +378,7 @@ import static gitlet.Utils.*;
                 }
             }
         }
+
     }
     public void reset(String commitSID) throws IOException {
         Commit resetCommit = findCommit(commitSID);
