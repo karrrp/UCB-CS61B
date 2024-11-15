@@ -48,21 +48,29 @@ public class testBranch {
         ffile.createNewFile();
         gfile.createNewFile();
         gitlet.add("f.txt");
-        writeContents(ffile,"wug");
+        writeContents(ffile,"This is a wug.");
         gitlet.add("g.txt");
-        writeContents(gfile, "not wug");
+        writeContents(gfile, "This is not a wug.");
         gitlet.commit("first commit", null);
         gitlet.branch("other");
-        writeContents(ffile, "3wug");
+        File hfile = join(Repository.CWD, "h.txt");
+        hfile.createNewFile();
+        writeContents(hfile, "Another wug.");
+        gitlet.add("h.txt");
+        gitlet.rm("g.txt");
+        writeContents(ffile, "Another wug.");
         gitlet.add("f.txt");
-        gitlet.commit("master change", null);
+        gitlet.commit("Add h.txt, remove g.txt", null);
         gitlet.checkoutBranch("other");
-        gfile.createNewFile();
-        writeContents(ffile,"2wug");
+        writeContents(ffile,"This is not a wug.");
         gitlet.add("f.txt");
-        gitlet.commit("change", null);
+        File kfile = join(Repository.CWD, "k.txt");
+        writeContents(kfile, "And yet another wug.");
+        gitlet.add("k.txt");
+        gitlet.commit("Add k.txt and modify f.txt", null);
         gitlet.checkoutBranch("master");
         gitlet.merge("other");
+        gitlet.status();
 
     }
 }

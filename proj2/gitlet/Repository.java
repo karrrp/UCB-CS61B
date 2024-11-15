@@ -208,15 +208,14 @@ import static gitlet.Utils.*;
         }
         Commit headCommit = readObject(headToFile(), Commit.class);
         for (String FileName : cwdWorkingDir) {
-
             File file = join(CWD, FileName);
-            if (headCommit.hasFile(FileName)) {
-                if (!fileSh1ID(file).equals(headCommit.getFileUID(FileName))) {
-                    System.out.println(FileName);
-                }
-            } else if (stage.containKeyInAddition(FileName)) {
+            if (stage.containKeyInAddition(FileName)) {
                 if (!fileSh1ID(file).equals(stage.getStaged().get(FileName))) {
-                    System.out.println(FileName);
+                    System.out.println(FileName + " (modified)");
+                }
+            } else if (headCommit.hasFile(FileName)) {
+                if (!fileSh1ID(file).equals(headCommit.getFileUID(FileName)) && !stage.containKeyInAddition(FileName)) {
+                    System.out.println(FileName + " (modified)");
                 }
             }
         }
@@ -224,14 +223,14 @@ import static gitlet.Utils.*;
         for (String fileName : stageFile) {
             File file = join(CWD, fileName);
             if (!file.exists()) {
-                System.out.println(fileName);
+                System.out.println(fileName + " (delete)");
             }
         }
         Set<String> commitFile = headCommit.getCommitted().keySet();
         for (String fileName : commitFile) {
             File file = join(CWD, fileName);
-            if (!stageFile.contains(fileName) && !file.exists() && !stage.getRemoval().contains(fileName)) {
-                System.out.println(fileName);
+            if (!file.exists() && !stage.getRemoval().contains(fileName)) {
+                System.out.println(fileName + " (delete)");
             }
         }
         System.out.println();
@@ -527,7 +526,7 @@ import static gitlet.Utils.*;
             writer.write("<<<<<<< HEAD");
             writer.write("\n");
             writer.write(headContent.toString());// 将整个文件内容写入新文件
-            writer.write("======");
+            writer.write("=======");
             writer.write("\n");
             writer.write(fileContent.toString());
             writer.write(">>>>>>>");
