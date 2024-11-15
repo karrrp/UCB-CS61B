@@ -291,15 +291,15 @@ import static gitlet.Utils.*;
                 }
             }
             /*track the commit as master */
-            File newBranch = join(BRANCHES_DIR, branchName);
+            File branch = join(BRANCHES_DIR, branchName);
             try {
-                if (!newBranch.createNewFile() && !newBranch.exists()) {
+                if (!branch.createNewFile() && !branch.exists()) {
                     throw new RuntimeException("Failed to create file: newBranch");
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            writeObject(newBranch, readObject(master, Commit.class));
+            writeObject(branch, readObject(master, Commit.class));
             writeContents(head, branchName);
             simpleSet a = readObject(newBranch, simpleSet.class);
             a.addBranchName(branchName);

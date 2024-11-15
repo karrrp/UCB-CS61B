@@ -36,7 +36,7 @@ public class Commit implements Serializable {
             this.committed = new HashMap<>();
         } else if (staged.isEmpty()) {
             System.out.println("No changes added to the commit.");
-            System.exit(1);
+            System.exit(0);
         } else {
             parent = Repository.commitSh1ID(head);
             date = new Date();
