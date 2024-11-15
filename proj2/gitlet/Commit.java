@@ -25,22 +25,23 @@ public class Commit implements Serializable {
      * change the file tracking by stage
      * return the commit object*/
     public Commit(String message, Commit head, Stage staged) throws IOException {
+        if (message.isEmpty()) {
+            System.out.println("Please enter a commit message.");
+            System.exit(1);
+        }
         if (head == null) {
             this.message = "initial commit";
-                // 解析日期字符串
             date = new Date(0);
             this.parent = null;
             this.committed = new HashMap<>();
         } else if (staged.isEmpty()) {
             System.out.println("No changes added to the commit.");
-            throw new RuntimeException("no changes added to the commit");
+            System.exit(1);
         } else {
             parent = Repository.commitSh1ID(head);
             date = new Date();
             this.message = message;
-            /* 读出并克隆 */
             this.committed = head.committed;
-            /* 清除stage的文件，添加到commit里面 */
             for (String key : staged.getStaged().keySet()) {
                 committed.put(key, staged.getStaged().get(key));
             }
@@ -49,7 +50,6 @@ public class Commit implements Serializable {
                 committed.remove(key);
             }
             staged.clear_removal();
-            //stage
             writeObject(Repository.staged, staged);
         }
 

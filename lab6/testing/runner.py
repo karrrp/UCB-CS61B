@@ -7,7 +7,6 @@ from os import chdir, environ, getcwd, mkdir, remove
 from shutil import copyfile, rmtree
 from math import log
 from glob import glob
-
 SHORT_USAGE = """\
 Usage: python3 runner.py OPTIONS TEST.in ...
    OPTIONS may include
@@ -168,8 +167,7 @@ def doCompile(target):
     out = ""
     try:
         full_cmnd = "{} {}".format(JAVAC_COMMAND, target)
-        out = check_output(full_cmnd, shell=True, universal_newlines=True,
-                           stdin=DEVNULL, stderr=STDOUT)
+        out = check_output(full_cmnd, shell=True, universal_newlines=True, encoding='utf-8', errors='ignore')
         return "OK", out
     except CalledProcessError as excp:
         return ("javac exited with code {}".format(excp.args[0]),

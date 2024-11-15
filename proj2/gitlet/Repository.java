@@ -3,12 +3,9 @@ import java.io.*;
 import java.util.*;
 import static gitlet.Utils.*;
 /** Represents a gitlet repository.
- *  设立持久性，建立.git文件夹以及blobs和stage文件夹。
- *  将不同命令的逻辑推给不同的类，
  *  does at a high level.
  *  @author karup
- */
-public class Repository {
+ */public class Repository {
     public static final File CWD = new File(System.getProperty("user.dir"));
     public static final File GITLET_DIR = join(CWD, ".gitlet");
     public static final File staged = join(GITLET_DIR, "stage");
@@ -19,12 +16,12 @@ public class Repository {
     public static final File master = join(BRANCHES_DIR,"master");
     public static final File head = join(GITLET_DIR, "head");
     public static final File newBranch = join(GITLET_DIR, "newBranch");
-    /**返回头指针文件。保存着序列化后的commit*/
+    /**commit*/
     private File headToFile() {
         String headFilename = readContentsAsString(head);
         return join(BRANCHES_DIR, headFilename);
     }
-    /**设立持久性*/
+    /***/
     private  void setPersistence() {
         if (!GITLET_DIR.mkdir() && !GITLET_DIR.exists()) {
             throw new RuntimeException("Failed to create directory: GITLET_DIR");
@@ -58,7 +55,6 @@ public class Repository {
         } catch (IOException e) {
             throw new RuntimeException("Failed to create file: newBranch", e);
         }
-
         try {
             if (!head.createNewFile() && !head.exists()) {
                 throw new RuntimeException("Failed to create file: master");
@@ -78,12 +74,10 @@ public class Repository {
             throw new RuntimeException("Failed to create file: staged", e);
         }
     }
-/** 建立git库 */
+
     public void init() throws IOException {
-        /*防止建立相同git文件*/
         if (!GITLET_DIR.exists()) {
             setPersistence();
-            /*提交初始commit*/
             Stage curStaged = readObject(staged, Stage.class);
             Commit initial_commit = new Commit("initial commit", null, curStaged);
             /* hand the commit BolS*/
@@ -98,10 +92,6 @@ public class Repository {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
         }
     }
-/**克隆当前的commit
- * 根据暂存区更新commit跟踪的文件
- * @param message 预备commit的message
- * 更新头指针*/
     public void commit(String message) throws IOException {
         /*read the current commit and stage*/
         if (message.isEmpty()) {
@@ -120,7 +110,6 @@ public class Repository {
         /*change the head point*/
         writeObject(headToFile(),curCommit);
     }
-/**打印出历史提交信息*/
     public void log() {
         Commit commit = readObject(headToFile(), Commit.class);
         while (commit != null) {
@@ -128,7 +117,6 @@ public class Repository {
             commit = findCommit(commit.getParent());
         }
     }
-/**不按照顺序打印所有提交信息*/
     public void global_log() {
         List<String> allCommits = plainFilenamesIn(COMMITS_DIR);
         if (allCommits == null) {
@@ -140,7 +128,6 @@ public class Repository {
     }
 
     public void find(String message) {
-        /*读出包含所有commitSID的列表*/
         List <String> commitSIDlist = plainFilenamesIn(COMMITS_DIR);
         boolean hasTheCommit = false;
         assert commitSIDlist != null;
@@ -155,9 +142,6 @@ public class Repository {
             System.out.println("Found no commit with that message.");
         }
     }
-    /** 判断head 指针指向的commited所指向的bolbs和这个fileName的bolbs是否相同
-     * 先she1此file文件，随后读出commit，读出filename对应的hashcode
-     * */
     public void add(String fileName) throws IOException {
         //是否存在这个文件
         File toStagedCWDfile = join(CWD, fileName);
@@ -173,22 +157,16 @@ public class Repository {
             writeObject(staged, curStaged);
             return;
         }
-        /*检查add的文件是不是和当前commit追踪的文件相同
-        * 如果有，不add
-        * 并且检查缓存区是否有这个文件，有则删除*/
         if (bolbsID.equals(curCommit.getCommitted().get(fileName))) {
             curStaged.rmFileInAddition(fileName);
         } else {
-            /*是否bolbs已经有了这个文件版本，没有就创建一个*/
             File theBolbs = join(BOLBS_DIR, bolbsID);
             if (!theBolbs.exists()) {
                 if (!theBolbs.createNewFile() && !theBolbs.exists()) {
                     throw new RuntimeException("Failed to create file: theBolbs");
                 }
-                /*在bolbs树里储存这个文件版本*/
                 copyFile(toStagedCWDfile, theBolbs);
             }
-            /*把这个文件存到暂存区*/
             curStaged.stagedForAddition(fileName);
         }
         writeObject(staged, curStaged);
@@ -273,8 +251,6 @@ public class Repository {
         }
         System.out.println();
     }
-    /**如果当前commit跟踪了这个文件，那么删除当前目录的这个文件。并把这个文件缓存到removal区，下一次commit不在跟踪这个文件
-     * 如果这个文件名在缓存区也要去去掉*/
     public void rm(String fileName) {
         /* check if the file been staged or be tracked*/
         Stage curStaged = readObject(staged, Stage.class);
@@ -292,9 +268,17 @@ public class Repository {
         curStaged.rmFileInAddition(fileName);
         writeObject(staged, curStaged);
     }
-    private class simpleSet implements Serializable {
-        public TreeSet<String> set;
-
+    private static class simpleSet implements Serializable {
+        private final TreeSet<String> set = new TreeSet<>();
+        public boolean containBranchName(String branchName) {
+            return set.contains(branchName);
+        }
+        public void addBranchName(String branchName) {
+            set.add(branchName);
+        }
+        public void rmBranchName(String branchName) {
+            set.remove(branchName);
+        }
     }
     /**create a new branch
      * @param branchName the name of new branch */
@@ -318,15 +302,10 @@ public class Repository {
             writeObject(newBranch, readObject(master, Commit.class));
             writeContents(head, branchName);
             simpleSet a = readObject(newBranch, simpleSet.class);
-            a.set.add(branchName);
+            a.addBranchName(branchName);
             writeObject(newBranch, a);
         }
     }
-    /**
-     * @param fileName 要回溯的文件名.
-     * @param commitSId 要回溯的提交
-     * 给出文件名和指定的提交，用指定提交的文件
-     * 覆盖已存在的文件版本（如果存在）*/
     public void checkoutHead(String fileName, String commitSId) {
         Commit commit = (commitSId.equals("head"))? readObject(headToFile(), Commit.class):findCommit(commitSId);
         if (commit != null) {
@@ -352,52 +331,41 @@ public class Repository {
             System.out.println("No commit with that id exists.");
         }
     }
-    /**把当前目录的一切都换成分支头提交跟踪的文件。
-     * 对于当前目录的文件，两者都有则覆盖，分支没有当前有就删除，分支有当前没有就添加。
-     * 如果一个文件还没有被当前提交跟踪，而分支头提交跟踪了，那么checkout失败。提醒你先删除或者暂存提交。
-     * @param branchName 要切换的分支名*/
     public void checkoutBranch(String branchName) throws IOException {
-        /*检查branchName是不是当前分支*/
         if (branchName.equals(readContentsAsString(headToFile()))) {
             System.out.println("No need to checkout the current branch.");
         } else if (Objects.requireNonNull(plainFilenamesIn(BRANCHES_DIR)).contains(branchName)) {
             File branch = join(BRANCHES_DIR, branchName);
             Commit branchCommit = readObject(branch, Commit.class);
             Commit headCommit = readObject(headToFile(), Commit.class);
-            /* 遍历并删除所有该删的文件，当前分支中跟踪但不存在于签出分支中的任何文件都将被删除*/
             removeFile(headCommit, branchCommit, branchName);
-            /*重写阶段*/
+
             for (String name: branchCommit.getCommitted().keySet()) {
                 checkoutHead(name, commitSh1ID(branchCommit));
             }
-            /*清理缓存区*/
             Stage stage = readObject(staged, Stage.class);
             stage.clear_staged();
             stage.clear_removal();
             writeObject(staged, stage);
-            /*更改当前指针*/
             writeContents(head, branchName);
 
         } else {
             System.out.println("No such branch exists");
         }
     }
-    /**
-     *遍历并删除所有该删的文件，当前分支中跟踪但不存在于签出分支中的任何文件都将被删除*/
     private void removeFile(Commit headCommit, Commit branchCommit, String branchName) {
         simpleSet isBranchNew = readObject(newBranch, simpleSet.class);
-        if (isBranchNew.set.contains(branchName)) {
+        if (isBranchNew.containBranchName(branchName)) {
             for (String fName : Objects.requireNonNull(plainFilenamesIn(CWD))) {
                 File file = join(CWD, fName);
                 file.delete();
             }
-            isBranchNew.set.remove(branchName);
+            isBranchNew.rmBranchName(branchName);
             writeObject(newBranch, isBranchNew);
         }
         for (String fName : Objects.requireNonNull(plainFilenamesIn(CWD))) {
             File file = join(CWD, fName);
             if (file.exists()) {
-                /*当前没有但是在工作文件会被重写*/
                 Stage stage = readObject(staged, Stage.class);
                 if (!headCommit.getCommitted().containsKey(fName) && !stage.containKeyInAddition(fName) && branchCommit.getCommitted().containsKey(fName)) {
                     System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
@@ -421,7 +389,6 @@ public class Repository {
             for (String name: resetCommit.getCommitted().keySet()) {
                 checkoutHead(name, commitSh1ID(resetCommit));
             }
-            /*清理缓存区*/
             Stage stage = readObject(staged, Stage.class);
             stage.clear_staged();
             stage.clear_removal();
@@ -443,9 +410,7 @@ public class Repository {
             }
         }
     }
-    /**r合并分支，更改当前目录，创建一个新的commit*/
     public void merge(String branchName) throws IOException {
-        /*如果有暂存区为提交，分支不存在，分支名字是当前头则失败*/
         mergeEXPHandle(branchName);
         /*找出分支提交和当前提交*/
         File branchHeadFile = join(BRANCHES_DIR, branchName);
@@ -578,7 +543,7 @@ public class Repository {
         }
         return kanye;
     }
-/**通过分支头和当前节点提交找到第一个祖先节点*/
+    /**通过分支头和当前节点提交找到第一个祖先节点*/
     private Commit splitCommit(String branchName) {
         File branchHeadFile = join(BRANCHES_DIR, branchName);
         Commit branchHeadCommit = readObject(branchHeadFile, Commit.class);
@@ -680,7 +645,7 @@ public class Repository {
         System.out.print("\n");
     }
 
-     static void copyFile(File sou, File des) {
+    static void copyFile(File sou, File des) {
         try (FileInputStream fis = new FileInputStream(sou);
              FileOutputStream fos = new FileOutputStream(des)) {
             byte[] buffer = new byte[2000];

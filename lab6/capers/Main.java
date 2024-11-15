@@ -67,7 +67,7 @@ public class Main {
     /**
      * Checks the number of arguments versus the expected number,
      * throws a RuntimeException if they do not match.
-     *
+     *哈哈哈这里有人类
      * @param cmd Name of command you are validating
      * @param args Argument array from command line
      * @param n Number of expected arguments
