@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static gitlet.Utils.join;
+import static gitlet.Utils.writeContents;
 
 public class testBranch {
     @Test
@@ -17,10 +18,25 @@ public class testBranch {
         ffile.createNewFile();
         gfile.createNewFile();
         gitlet.add("f.txt");
+        writeContents(ffile,"wug");
         gitlet.add("g.txt");
-        gitlet.commit("first commit");
+        writeContents(gfile, "not wug");
+        gitlet.commit("first commit", null);
         gitlet.branch("other");
-        gitlet.checkoutBranch("master");
+        File hfile = join(Repository.CWD, "h.txt");
+        hfile.createNewFile();
+        writeContents(hfile,"2 wug");
+        gitlet.add("h.txt");
+        gitlet.rm("g.txt");
+        gitlet.commit("Add h.txt and remove g.txt", null);
         gitlet.checkoutBranch("other");
+        File kfile = join(Repository.CWD, "k.txt");
+        kfile.createNewFile();
+        writeContents(kfile,"3 wug");
+        gitlet.add("k.txt");
+        gitlet.rm("f.txt");
+        gitlet.commit("Add k.txt and remove f.txt", null);
+        gitlet.checkoutBranch("master");
+        gitlet.merge("other");
     }
 }

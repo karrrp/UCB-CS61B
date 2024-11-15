@@ -39,7 +39,7 @@ import static gitlet.Repository.GITLET_DIR;
             case "commit":
                 validateNumArgs(args, 2);
                 try {
-                    gitlet.commit(args[1]);
+                    gitlet.commit(args[1], null);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

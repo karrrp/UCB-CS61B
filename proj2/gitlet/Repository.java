@@ -92,7 +92,7 @@ import static gitlet.Utils.*;
             System.out.println("A Gitlet version-control system already exists in the current directory.");
         }
     }
-    public void commit(String message) throws IOException {
+    public void commit(String message, String secondParent) throws IOException {
         /*read the current commit and stage*/
         if (message.isEmpty()) {
             System.out.println("Please enter a commit message.");
@@ -101,6 +101,7 @@ import static gitlet.Utils.*;
         Commit headCommit = readObject(headToFile(), Commit.class);
         Stage curStaged = readObject(staged, Stage.class);
         Commit curCommit = new Commit(message, headCommit, curStaged);
+        curCommit.setSecond_parent(secondParent);
         /*hand cur commit*/
         try {
             write_commit(curCommit);
@@ -462,6 +463,8 @@ import static gitlet.Utils.*;
                     }
                     add(FileName);
                 }
+
+            }
                 /*只有当前分支追踪的，保持原样*/
                 /*只在给定分支的,check并且检出，类似与check_merge*/
                 for (String onlyBranch : findOnlyTrackedByBranch(branchName).keySet()) {
@@ -481,7 +484,8 @@ import static gitlet.Utils.*;
                     }
                     add(onlyBranch);
                 }
-            }
+                commit(String.format("Merged %s into %s.", branchName, readContentsAsString(head)), branchName);
+
         }
     }
     /** 把两个文件融合**/

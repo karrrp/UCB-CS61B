@@ -16,6 +16,7 @@ import static gitlet.Utils.writeObject;
  */
 public class Commit implements Serializable {
     private String parent;
+    private String second_parent;
     private Date date;
     private String message;
     /** The file this commit pointing. */
@@ -27,7 +28,7 @@ public class Commit implements Serializable {
     public Commit(String message, Commit head, Stage staged) throws IOException {
         if (message.isEmpty()) {
             System.out.println("Please enter a commit message.");
-            System.exit(1);
+            System.exit(0);
         }
         if (head == null) {
             this.message = "initial commit";
@@ -52,8 +53,12 @@ public class Commit implements Serializable {
             staged.clear_removal();
             writeObject(Repository.staged, staged);
         }
-
     }
+
+    public void setSecond_parent(String second_parent) {
+        this.second_parent = second_parent;
+    }
+
     public HashMap <String, String> getCommitted() {
         return committed;
     }
