@@ -284,7 +284,7 @@ import static gitlet.Utils.*;
      * @param branchName the name of new branch */
     public void branch(String branchName) {
         if(plainFilenamesIn(GITLET_DIR) != null) {
-            for (String i : Objects.requireNonNull(plainFilenamesIn(GITLET_DIR))) {
+            for (String i : Objects.requireNonNull(plainFilenamesIn(BRANCHES_DIR))) {
                 if (i.equals(branchName)) {
                     System.out.println("A branch with that name already exists.");
                     System.exit(0);
