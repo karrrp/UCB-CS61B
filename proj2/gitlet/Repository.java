@@ -299,7 +299,6 @@ import static gitlet.Utils.*;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
             writeObject(branch, readObject(master, Commit.class));
             simpleSet a = readObject(newBranch, simpleSet.class);
             a.addBranchName(branchName);
@@ -348,10 +347,11 @@ import static gitlet.Utils.*;
                 isBranchNew.rmBranchName(branchName);
                 writeObject(newBranch, isBranchNew);
                 return;
-            }
-            removeFile(headCommit, branchCommit, branchName);
-            for (String name: branchCommit.getCommitted().keySet()) {
+            } else {
+                removeFile(headCommit, branchCommit, branchName);
+                for (String name: branchCommit.getCommitted().keySet()) {
                 checkoutHead(name, commitSh1ID(branchCommit));
+                }
             }
             Stage stage = readObject(staged, Stage.class);
             stage.clear_staged();
