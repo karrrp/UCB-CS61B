@@ -346,7 +346,6 @@ import static gitlet.Utils.*;
                 }
                 isBranchNew.rmBranchName(branchName);
                 writeObject(newBranch, isBranchNew);
-                return;
             } else {
                 removeFile(headCommit, branchCommit, branchName);
                 for (String name: branchCommit.getCommitted().keySet()) {
